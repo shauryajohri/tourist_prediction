@@ -1,0 +1,15 @@
+# Tourist Predictor
+
+A machine learning project that predicts tourism trends using historical data and Google Trends via `pytrends`.
+
+## Features
+
+- Google Trends integration
+- Data preprocessing
+- Machine learning model for prediction
+- Visualization of trends
+
+## Installation
+
+```bash
+pip install -r requirements.txt
