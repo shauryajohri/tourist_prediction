@@ -23,3 +23,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local search history written by the app at runtime
+data/trip_history.json
+
+# Build tooling, not part of the project
+10k-websites/
