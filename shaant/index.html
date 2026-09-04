@@ -331,6 +331,35 @@ section{position:relative;padding:110px 0;scroll-margin-top:86px}
   transition:border-color .3s var(--ease),background .3s var(--ease),color .3s var(--ease)}
 .chip.day:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.08)}
 
+/* ---------- spot cards ---------- */
+.spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
+.spot{position:relative;display:flex;flex-direction:column;
+  background:var(--canvas-deep);border:1px solid var(--line);border-radius:14px;
+  padding:17px 18px 15px;overflow:hidden;
+  transition:border-color .4s var(--ease),transform .4s var(--ease),background .4s var(--ease)}
+.spot:hover{border-color:var(--line-strong);transform:translateY(-3px);background:var(--panel)}
+/* the contour motif, carried through to the smallest card */
+.spot::before{content:"";position:absolute;right:-30px;top:-26px;width:120px;height:88px;
+  pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='88'%3E%3Cg fill='none' stroke='%232a3646' stroke-width='1'%3E%3Cpath d='M0 20 C26 8 50 30 74 20 94 12 108 24 120 18'/%3E%3Cpath d='M0 36 C28 24 52 46 76 36 96 28 110 40 120 34'/%3E%3Cpath d='M0 52 C30 40 54 62 78 52 98 44 112 56 120 50'/%3E%3C/g%3E%3C/svg%3E")}
+.spot>*{position:relative}
+.spot .top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.spot h4{margin:0;font-family:var(--display);font-variation-settings:'wdth' 110;font-weight:600;
+  font-size:16.5px;line-height:1.22;letter-spacing:-.005em}
+.spot .km{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:var(--cool);white-space:nowrap;padding-top:2px}
+.spot .km.here{color:var(--text-secondary)}
+.spot p{margin:9px 0 0;font-size:14px;line-height:1.5;color:var(--text-secondary)}
+.spot .dir{margin-top:auto;padding-top:13px;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary);
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  transition:color .3s var(--ease)}
+.spot .dir:hover{color:var(--accent)}
+.spot .dir svg{transition:transform .3s var(--ease)}
+.spot .dir:hover svg{transform:translate(2px,-2px)}
+@media (pointer:coarse){.spot .dir{min-height:44px;align-items:center}}
+.note{font-size:13px;color:var(--text-secondary);margin-top:14px;line-height:1.5}
+
 /* month strip */
 .months{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end;height:118px;margin-top:4px}
 .mo{display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:7px;cursor:default}
@@ -586,7 +615,8 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
           <div class="chips" id="quieter-days"></div>
 
           <p class="blockhead">Worth seeing there</p>
-          <div class="chips" id="r-places"></div>
+          <div class="spots" id="r-spots"></div>
+          <p class="note" id="spots-note"></p>
 
           <p class="blockhead">Rooms, roughly</p>
           <div class="tiles">
@@ -735,36 +765,196 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 /* ============================================================
    0. Static content: the 29 destinations
    ============================================================ */
+/* Each spot is [name, approximate km from the town centre, one line about it].
+   The distances are rounded on purpose: they are approximate road distances from
+   general knowledge, not surveyed figures. Every card carries a Directions link
+   so Google Maps gives the exact route, which is the number to trust.
+   "hub" is the place Directions measures from, when it differs from the entry. */
 var SITES = {
- "Almora":{alt:1638,kind:"Hill town",places:["Bright End Corner","Kasar Devi Temple","Chitai Golu Devta Temple","Katarmal Sun Temple"]},
- "Auli":{alt:2800,kind:"Snow and skiing",places:["Auli Ropeway","Gurso Bugyal","Chenab Lake","Auli Artificial Lake"]},
- "Badrinath":{alt:3133,kind:"Pilgrimage",places:["Badrinath Temple","Mana Village","Vasudhara Falls","Tapt Kund"]},
- "Bhimtal":{alt:1370,kind:"Lakes",places:["Bhimtal Lake","Victoria Dam","Aquarium Island","Hidimba Parvat"]},
- "Bhowali":{alt:1706,kind:"Hill town",places:["Golu Devta Temple","Bhowali Fruit Market","Sattal nearby","Naukuchiatal nearby"]},
- "Chopta":{alt:2680,kind:"Meadows and trek",places:["Tungnath Temple","Chandrashila Peak","Deoria Tal","Kanchula Korak Musk Deer Sanctuary"]},
- "Darma Valley":{alt:3500,kind:"Remote valley",places:["Panchachuli Base Camp","Dar Village","Dugtu","Sipu Village"]},
- "Dehradun":{alt:640,kind:"City",places:["Robber's Cave","Sahastradhara","Forest Research Institute","Mindrolling Monastery"]},
- "Dhanaulti":{alt:2286,kind:"Quiet hill town",places:["Eco Park","Surkanda Devi Temple","Dashavatar Temple","Apple orchards"]},
- "Gangotri":{alt:3100,kind:"Pilgrimage",places:["Gangotri Temple","Gaumukh Glacier","Bhagirath Shila","Surya Kund"]},
- "Haridwar":{alt:314,kind:"Pilgrimage",places:["Har Ki Pauri","Mansa Devi Temple","Ganga Aarti","Chandi Devi Temple"]},
- "Jim Corbett National Park":{alt:385,kind:"Wildlife",places:["Dhikala Zone","Corbett Waterfall","Sitabani Wildlife Reserve","Bijrani Zone"]},
- "Kausani":{alt:1890,kind:"Mountain views",places:["Anasakti Ashram","Rudradhari Falls","Kausani Tea Estate","Baijnath Temple"]},
- "Kedarkantha":{alt:3810,kind:"Winter trek",places:["Kedarkantha Peak","Juda Ka Talab","Sankri Village","Hargaon Camp"]},
- "Kedarnath":{alt:3583,kind:"Pilgrimage",places:["Kedarnath Temple","Bhairavnath Temple","Vasuki Tal","Gandhi Sarovar"]},
- "Lansdowne":{alt:1706,kind:"Quiet cantonment",places:["Tip-in-Top","Bhulla Tal","St. Mary's Church","Darwan Singh Museum"]},
- "Mukteshwar":{alt:2286,kind:"Orchards and cliffs",places:["Mukteshwar Dham","Chauli Ki Jali","Bhalu Gaad Waterfalls","Methodist Church"]},
- "Munsiyari":{alt:2200,kind:"Mountain views",places:["Khaliya Top","Birthi Falls","Nanda Devi Temple","Maheshwari Kund"]},
- "Mussoorie":{alt:2005,kind:"Hill station",places:["Mall Road","Kempty Falls","Gun Hill Point","Landour"]},
- "Nainital":{alt:2084,kind:"Lakes",places:["Naini Lake","Naina Devi Temple","Snow View Point","Tiffin Top"]},
- "Nanda Devi National Park":{alt:3500,kind:"Wildlife and trek",places:["Nanda Devi Sanctuary","Joshimath","Auli nearby","Valley of Flowers nearby"]},
- "Panchachuli Peaks":{alt:6904,kind:"Peak views",places:["Panchachuli Base Camp","Munsiyari viewpoint","Birthi Falls","Khaliya Top"]},
- "Ramnagar":{alt:345,kind:"Wildlife gateway",places:["Corbett Museum","Girija Devi Temple","Kosi River","Garjiya Devi Temple"]},
- "Ranikhet":{alt:1869,kind:"Quiet cantonment",places:["Jhula Devi Temple","Chaubatia Gardens","Golf Course","Bhalu Dam"]},
- "Rishikesh":{alt:372,kind:"River and yoga",places:["Laxman Jhula","Triveni Ghat","River rafting","Beatles Ashram"]},
- "Roopkund":{alt:5029,kind:"High trek",places:["Roopkund Lake","Bedni Bugyal","Ali Bugyal","Junargali Pass"]},
- "Tapovan":{alt:4463,kind:"High trek",places:["Tapovan meadow","Shivling viewpoint","Gangotri Glacier trail","Nandanvan"]},
- "Valley of Flowers":{alt:3658,kind:"Alpine flowers",places:["Valley of Flowers","Hemkund Sahib","Govindghat","Ghangaria"]},
- "Yamunotri":{alt:3293,kind:"Pilgrimage",places:["Yamunotri Temple","Surya Kund","Janki Chatti","Divya Shila"]}
+ "Almora":{alt:1638,kind:"Hill town",spots:[
+   ["Bright End Corner",2,"Sunset viewpoint looking out at the Himalayan wall."],
+   ["Chitai Golu Devta Temple",8,"Thousands of brass bells, tied by people asking for justice."],
+   ["Kasar Devi Temple",8,"Ridge temple that drew Bob Dylan and the Beat writers in their time."],
+   ["Katarmal Sun Temple",17,"Ninth century sun temple, the second most important in India after Konark."],
+   ["Deer Park",3,"Small forest park on the edge of town."]]},
+ "Auli":{alt:2800,kind:"Snow and skiing",hub:"Auli",spots:[
+   ["Auli Ropeway",0,"One of Asia's longest cable cars, running up from Joshimath."],
+   ["Gurso Bugyal",3,"Meadow above the treeline, walkable in a morning."],
+   ["Chattrakund",4,"Small lake ringed by oak forest."],
+   ["Chenab Lake",12,"Quiet alpine lake, a longer walk or pony ride."],
+   ["Joshimath",13,"The town below, and the road junction for Badrinath."]]},
+ "Badrinath":{alt:3133,kind:"Pilgrimage",spots:[
+   ["Badrinath Temple",0,"The shrine itself, in bright paint against grey rock."],
+   ["Tapt Kund",0,"Hot sulphur spring directly below the temple steps."],
+   ["Charan Paduka",3,"Rock said to carry Vishnu's footprint, a steep short climb."],
+   ["Mana Village",3,"The last village before the Tibet border."],
+   ["Vasudhara Falls",9,"A 122 m fall, reached on foot from Mana."]]},
+ "Bhimtal":{alt:1370,kind:"Lakes",spots:[
+   ["Bhimtal Lake",0,"The lake the town is built around, bigger and calmer than Naini."],
+   ["Aquarium Island",0,"Island in the middle of the lake, reached by boat."],
+   ["Victoria Dam",1,"The old stone dam at the lake's edge."],
+   ["Naukuchiatal",4,"The nine cornered lake. Local belief says seeing all nine corners at once grants a wish."],
+   ["Sattal",6,"Seven connected lakes in oak and pine forest. Good for birds."]]},
+ "Bhowali":{alt:1706,kind:"Hill town",spots:[
+   ["Bhowali Fruit Market",0,"Roadside market, worth stopping for in peach and apricot season."],
+   ["Golu Devta Temple, Ghorakhal",4,"Bell covered temple to the god of justice."],
+   ["Naukuchiatal",10,"The nine cornered lake."],
+   ["Nainital",11,"The busy neighbour, close enough for a day trip."],
+   ["Sattal",12,"Seven quiet connected lakes."]]},
+ "Chopta":{alt:2680,kind:"Meadows and trek",spots:[
+   ["Tungnath Temple",4,"The highest Shiva temple in the world, a steady walk up."],
+   ["Chandrashila Peak",5,"Summit above Tungnath at about 4,000 m. Sunrise over Nanda Devi."],
+   ["Kanchula Korak Musk Deer Sanctuary",7,"Dense forest reserve on the road in."],
+   ["Deoria Tal",14,"Lake that holds the reflection of the Chaukhamba peaks."],
+   ["Ukhimath",29,"Winter seat of the Kedarnath deity."]]},
+ "Darma Valley":{alt:3500,kind:"Remote valley",hub:"Dharchula",spots:[
+   ["Dar Village",0,"Stone and wood houses, one of the valley's main settlements."],
+   ["Nagling",5,"Small village on the valley trail."],
+   ["Dugtu",8,"Where the valley opens out and the peaks come into full view."],
+   ["Sipu Village",14,"Far up the valley, close to the old Tibet trade route."],
+   ["Panchachuli Base Camp",20,"Under the five peaks. A serious walk, not a day trip."]]},
+ "Dehradun":{alt:640,kind:"City",hub:"Dehradun",spots:[
+   ["Tapkeshwar Temple",6,"Cave temple with water dripping onto the lingam."],
+   ["Forest Research Institute",7,"Vast colonial brick building set in its own grounds."],
+   ["Robber's Cave",8,"A stream running through a narrow gorge. You walk in the water."],
+   ["Mindrolling Monastery",8,"Tibetan monastery with a tall stupa and gardens."],
+   ["Malsi Deer Park",10,"Small zoo and forest park on the Mussoorie road."],
+   ["Sahastradhara",14,"Sulphur springs and terraced water, very busy at weekends."]]},
+ "Dhanaulti":{alt:2286,kind:"Quiet hill town",spots:[
+   ["Eco Park",1,"Two small parks, Amber and Dhara, in deodar forest."],
+   ["Dashavatar Temple",2,"Small temple to the ten avatars of Vishnu."],
+   ["Apple orchards",3,"Working orchards along the ridge road."],
+   ["Surkanda Devi Temple",8,"Shakti Peeth on a summit, a steep 1.5 km climb from the road."],
+   ["Kanatal",10,"Quieter still, camps and open ridge views."]]},
+ "Gangotri":{alt:3100,kind:"Pilgrimage",spots:[
+   ["Gangotri Temple",0,"White stone temple beside the Bhagirathi."],
+   ["Surya Kund",1,"Waterfall just below the temple where the river drops through rock."],
+   ["Bhagirath Shila",1,"The rock where King Bhagirath is said to have meditated."],
+   ["Pandava Gufa",2,"Cave on the trail out of town."],
+   ["Gaumukh Glacier",18,"The snout of the glacier where the Ganga begins. Permit and a full day's trek."]]},
+ "Haridwar":{alt:314,kind:"Pilgrimage",hub:"Haridwar",spots:[
+   ["Har Ki Pauri",0,"The main ghat. Come at dusk for the Ganga Aarti."],
+   ["Mansa Devi Temple",3,"Hilltop temple reached by ropeway or a long stair climb."],
+   ["Chandi Devi Temple",4,"The other hill temple, also with a ropeway."],
+   ["Bharat Mata Mandir",5,"Eight storey temple, one floor per theme."],
+   ["Rajaji National Park, Chilla",10,"Elephant country on the far bank of the Ganga."]]},
+ "Jim Corbett National Park":{alt:385,kind:"Wildlife",hub:"Ramnagar",spots:[
+   ["Bijrani Zone",2,"Closest safari gate to Ramnagar. Grassland and sal forest."],
+   ["Garjiya Devi Temple",14,"Temple on a rock in the middle of the Kosi river."],
+   ["Dhangarhi Gate for Dhikala",18,"The gate for Dhikala, the deepest and most sought after zone."],
+   ["Sitabani Forest",20,"Buffer forest outside the park. No permit needed, good for birds."],
+   ["Corbett Falls",25,"A 20 m fall in dense forest off the Kaladhungi road."],
+   ["Corbett Museum, Kaladhungi",26,"Jim Corbett's own house, kept as a museum."]]},
+ "Kausani":{alt:1890,kind:"Mountain views",spots:[
+   ["Anasakti Ashram",1,"Where Gandhi wrote his commentary on the Gita. The view is the reason."],
+   ["Sunset Point",1,"Straight look at the Trishul and Nanda Devi group."],
+   ["Kausani Tea Estate",5,"Working tea garden on the slope, open to walk through."],
+   ["Rudradhari Falls",12,"Falls and a cave temple, reached on foot through fields."],
+   ["Baijnath Temple",17,"Twelfth century stone temple on the bank of the Gomti."]]},
+ "Kedarkantha":{alt:3810,kind:"Winter trek",hub:"Sankri",spots:[
+   ["Sankri Village",0,"The base village. Everything starts and ends here."],
+   ["Govind National Park",2,"The reserve the whole trek sits inside."],
+   ["Juda Ka Talab",4,"Lake that freezes solid in winter. The usual first camp."],
+   ["Hargaon Camp",6,"Second camp, in clearings among the pines."],
+   ["Kedarkantha Peak",9,"The summit at 3,810 m. Usually a pre dawn start."]]},
+ "Kedarnath":{alt:3583,kind:"Pilgrimage",spots:[
+   ["Kedarnath Temple",0,"Stone temple under the Kedarnath peak. Open roughly May to November."],
+   ["Bhairavnath Temple",1,"On the ridge above the shrine, with the best view back down."],
+   ["Gandhi Sarovar",3,"Also called Chorabari Tal, a glacial lake above the temple."],
+   ["Vasuki Tal",8,"High lake at about 4,150 m. A hard day out and back."],
+   ["Gaurikund",16,"Road head and hot spring where the 16 km walk up begins."]]},
+ "Lansdowne":{alt:1706,kind:"Quiet cantonment",spots:[
+   ["Bhulla Tal",1,"Small lake built and kept by the army."],
+   ["St. Mary's Church",1,"Built in 1896, now a small museum."],
+   ["Darwan Singh Museum",1,"Garhwal Rifles regimental museum."],
+   ["Tip-in-Top",2,"Viewpoint over the Shivalik hills, sometimes as far as the snow line."],
+   ["Tarkeshwar Mahadev",38,"Shiva temple deep in a deodar forest. A long but good drive."]]},
+ "Mukteshwar":{alt:2286,kind:"Orchards and cliffs",spots:[
+   ["Mukteshwar Dham",1,"A 350 year old Shiva temple at the top of the cliff."],
+   ["Chauli Ki Jali",1,"The rock face itself. Views straight out, and rappelling if you want it."],
+   ["Methodist Church",1,"Small stone church from the British period."],
+   ["Sitla",5,"Quiet hamlet in orchards, even calmer than Mukteshwar."],
+   ["Bhalu Gaad Waterfalls",8,"A 60 m fall reached by a walk down through forest."]]},
+ "Munsiyari":{alt:2200,kind:"Mountain views",spots:[
+   ["Nanda Devi Temple",1,"Small temple looking straight at the Panchachuli five."],
+   ["Tribal Heritage Museum",1,"One man's collection of Johar valley life and trade."],
+   ["Maheshwari Kund",3,"Small lake above the town with a local legend attached."],
+   ["Khaliya Top",9,"Meadow at about 3,500 m with the full Panchachuli line in view."],
+   ["Thamri Kund",10,"Forest lake, sometimes visited by musk deer."],
+   ["Birthi Falls",35,"A 126 m fall on the road in."]]},
+ "Mussoorie":{alt:2005,kind:"Hill station",hub:"Mussoorie",spots:[
+   ["Mall Road",0,"The main promenade, and most of the crowd."],
+   ["Gun Hill Point",1,"Second highest point in town, by ropeway. Clear mornings give the whole range."],
+   ["Company Garden",3,"Municipal garden with boating and food stalls."],
+   ["Landour and Lal Tibba",5,"The old cantonment above the town. Quieter, higher, better."],
+   ["Mussoorie Lake",6,"Small artificial lake on the Dehradun road."],
+   ["Cloud's End",7,"Where the town ends and the forest takes over."],
+   ["Kempty Falls",15,"The famous fall. Beautiful, and packed in season."]]},
+ "Nainital":{alt:2084,kind:"Lakes",hub:"Nainital",spots:[
+   ["Naini Lake",0,"The lake the whole town is arranged around."],
+   ["Naina Devi Temple",1,"Shakti Peeth on the northern shore."],
+   ["Snow View Point",2,"Ropeway up to a straight view of Nanda Devi on a clear day."],
+   ["Nainital Zoo",2,"High altitude zoo with snow leopards."],
+   ["Eco Cave Gardens",2,"Linked rock caves, good with children."],
+   ["Tiffin Top",4,"Also called Dorothy's Seat. Walk or ride up for the view back over the lake."],
+   ["Naina Peak",6,"The highest point above town, a real climb."]]},
+ "Nanda Devi National Park":{alt:3500,kind:"Wildlife and trek",hub:"Joshimath",spots:[
+   ["Joshimath",0,"The base town and road junction for the whole area."],
+   ["Vishnuprayag",12,"Where the Alaknanda and Dhauliganga meet."],
+   ["Auli",13,"Ski slopes and meadows above the town."],
+   ["Govindghat",20,"Road head for the Valley of Flowers and Hemkund walks."],
+   ["Nanda Devi Sanctuary",25,"The core reserve. Closed to general entry, buffer zones only."]]},
+ "Panchachuli Peaks":{alt:6904,kind:"Peak views",hub:"Munsiyari",spots:[
+   ["Munsiyari viewpoint",0,"The classic view of all five peaks, straight from the town."],
+   ["Khaliya Top",9,"Meadow that puts you level with the range."],
+   ["Thamri Kund",10,"Quiet forest lake above Munsiyari."],
+   ["Panchachuli Base Camp",25,"Under the peaks themselves, through the Darma valley. A trek, not a drive."],
+   ["Birthi Falls",35,"Tall fall on the approach road."]]},
+ "Ramnagar":{alt:345,kind:"Wildlife gateway",spots:[
+   ["Bijrani Zone gate",2,"Nearest safari entry to town."],
+   ["Kosi River",3,"River bank where elephants often cross at dusk."],
+   ["Garjiya Devi Temple",14,"Temple perched on a rock in the river."],
+   ["Sitabani Forest",20,"Buffer forest, no permit needed."],
+   ["Corbett Falls",25,"Waterfall in thick forest on the Kaladhungi road."],
+   ["Corbett Museum, Kaladhungi",26,"Jim Corbett's house, now a museum."]]},
+ "Ranikhet":{alt:1869,kind:"Quiet cantonment",spots:[
+   ["Kumaon Regimental Centre Museum",2,"Regimental history, well kept."],
+   ["Golf Course",5,"One of the highest courses in Asia, in open meadow."],
+   ["Jhula Devi Temple",7,"Bell covered temple, bells left by people whose wishes were granted."],
+   ["Chaubatia Gardens",10,"Apple and apricot orchards with a long Himalayan view."],
+   ["Majkhali",12,"Small settlement with a clean line of sight to Nanda Devi."],
+   ["Bhalu Dam",13,"Small artificial lake in the pines."]]},
+ "Rishikesh":{alt:372,kind:"River and yoga",spots:[
+   ["Triveni Ghat",0,"Evening aarti on the main ghat."],
+   ["Ram Jhula",3,"The first of the two suspension bridges, with ashrams on both banks."],
+   ["Laxman Jhula",5,"The famous bridge, and the cafes around it."],
+   ["Beatles Ashram",5,"Chaurasi Kutia, abandoned and covered in murals."],
+   ["Shivpuri",16,"Where most rafting runs put in."],
+   ["Neelkanth Mahadev",22,"Hill temple reached by a winding forest road."]]},
+ "Roopkund":{alt:5029,kind:"High trek",hub:"Lohajung",spots:[
+   ["Lohajung",0,"Base village where the trek starts."],
+   ["Ali Bugyal",11,"Wide meadow, one of the largest in the country."],
+   ["Bedni Bugyal",14,"Meadow with a small lake and Trishul filling the sky."],
+   ["Roopkund Lake",21,"The lake of skeletons at 5,029 m. Hundreds of ancient human remains."],
+   ["Junargali",22,"The ridge just above the lake."]]},
+ "Tapovan":{alt:4463,kind:"High trek",hub:"Gangotri",spots:[
+   ["Gangotri",0,"Trailhead town and temple."],
+   ["Bhojbasa",14,"The usual overnight stop on the way up."],
+   ["Gaumukh",18,"Snout of the Gangotri glacier."],
+   ["Tapovan meadow",23,"Meadow directly under Shivling. A steep crossing above Gaumukh."],
+   ["Nandanvan",25,"The meadow on the far side, facing the Bhagirathi peaks."]]},
+ "Valley of Flowers":{alt:3658,kind:"Alpine flowers",hub:"Govindghat",spots:[
+   ["Govindghat",0,"Road head. Everything above here is on foot or by pony."],
+   ["Pulna",4,"Where the walk now begins, a short drive up from Govindghat."],
+   ["Ghangaria",13,"The base village. Last beds before the valley."],
+   ["Valley of Flowers",17,"The valley itself. Best from mid July to mid August, when it is in bloom."],
+   ["Hemkund Sahib",19,"Sikh shrine beside a glacial lake at 4,632 m."]]},
+ "Yamunotri":{alt:3293,kind:"Pilgrimage",hub:"Janki Chatti",spots:[
+   ["Janki Chatti",0,"Road head where the 6 km climb begins."],
+   ["Kharsali",1,"Winter seat of the Yamuna deity, with an old Someshwar temple."],
+   ["Yamunotri Temple",6,"The shrine at the top of the walk."],
+   ["Surya Kund",6,"Hot spring beside the temple. Rice is cooked in it and taken as prasad."],
+   ["Divya Shila",6,"The rock pilgrims touch before entering the temple."]]}
 };
 
 var CLIMATE = {
@@ -1263,7 +1453,7 @@ var meterPaths = {O:document.getElementById('m-busy'),S:document.getElementById(
 function render(site, d, origin){
   var r = lookup(site, d);
   if(!r){ return; }
-  var V = VERDICT[r.code], meta = SITES[site] || {places:[site+' local sightseeing'], kind:'', alt:null};
+  var V = VERDICT[r.code], meta = SITES[site] || {spots:[], kind:'', alt:null};
   var cl = CLIMATE[d.getMonth()+1];
 
   document.getElementById('r-when').textContent =
@@ -1277,9 +1467,43 @@ function render(site, d, origin){
 
   for(var k in meterPaths) meterPaths[k].classList.toggle('lit', k===r.code);
 
-  var chips = meta.places.map(function(p){return '<span class="chip">'+p+'</span>';});
-  if(meta.alt) chips.unshift('<span class="chip" style="border-color:var(--accent-muted)">'+meta.alt.toLocaleString('en-IN')+' m</span>');
-  document.getElementById('r-places').innerHTML = chips.join('');
+  /* spot cards: name, how far from the centre, one line, and a real map link */
+  var town = meta.hub || site;                       /* plain town name */
+  var spots = meta.spots || [];
+  var arrow = '<svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true">'+
+              '<path d="M2 8L8 2M8 2H3.5M8 2v4.5" stroke="currentColor" stroke-width="1.4" '+
+              'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  document.getElementById('r-spots').innerHTML = spots.map(function(s){
+    var name = s[0], km = s[1], text = s[2];
+    /* a name that already names its own town is specific enough; the rest need the
+       town added, or "Sunset Point" and "Mall Road" land anywhere in India */
+    var query = (name.indexOf(',') > -1 ? name : name + ', ' + town) + ', Uttarakhand';
+    var href, label;
+    if(km === 0){
+      /* routing from the centre to the centre is useless, so show the pin instead */
+      href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      label = 'View on map';
+    } else {
+      href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(town + ', Uttarakhand') +
+             '&destination=' + encodeURIComponent(query) + '&travelmode=driving';
+      label = 'Directions';
+    }
+    var far = km === 0 ? '<span class="km here">in the centre</span>'
+                       : '<span class="km">'+km+' km</span>';
+    return '<article class="spot">'+
+             '<div class="top"><h4>'+name+'</h4>'+far+'</div>'+
+             '<p>'+text+'</p>'+
+             '<a class="dir" href="'+href+'" target="_blank" rel="noopener">'+
+               label+' <span class="sr">for '+name+'</span>'+arrow+'</a>'+
+           '</article>';
+  }).join('');
+
+  document.getElementById('spots-note').textContent =
+    spots.length
+      ? 'Distances are approximate, by road from the centre of ' + town +
+        (meta.alt ? ', which sits at about ' + meta.alt.toLocaleString('en-IN') + ' m' : '') +
+        '. Open any card in Google Maps for the exact route and driving time.'
+      : '';
 
   /* month strip */
   var m = r.monthly, mx = Math.max.apply(null, m), mn = Math.min.apply(null, m), sp = Math.max(1,mx-mn);
