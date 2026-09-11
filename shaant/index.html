@@ -1270,7 +1270,7 @@ function ensureMap(){
     L = lib;
     if(map){ map.invalidateSize(); return map; }
     $('map').innerHTML = '';
-    map = L.map('map', {scrollWheelZoom:false, zoomSnap:0.5});
+    map = L.map('map', {scrollWheelZoom:false});
     addTiles(0);
     /* wheel zoom only once the reader has clicked into the map, so the page still scrolls */
     map.on('click focus', function(){ map.scrollWheelZoom.enable(); });

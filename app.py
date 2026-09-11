@@ -6,7 +6,6 @@ from pathlib import Path
 from urllib.parse import quote_plus
 import json
 from datetime import datetime
-import streamlit.components.v1 as components
 
 from utils.preprocess import load_tourism_data, feature_engineer_date
 from utils.fetch_weather import get_weather_on_date
@@ -60,7 +59,7 @@ with st.sidebar:
     trip_date = st.date_input("Travel date", date.today(), min_value=date.today())
     site = st.selectbox("Destination", sites)
     show_weather = st.checkbox("Load live weather", value=False)
-    check = st.button("Show travel details", type="primary", use_container_width=True)
+    check = st.button("Show travel details", type="primary", width="stretch")
     history = load_history()
     if history:
         st.markdown("#### Recent searches")
@@ -121,9 +120,9 @@ st.write("  •  ".join(PLACES.get(site, [site+" local sightseeing"])[:6]))
 st.markdown("### Route from your location")
 maps = f"https://www.google.com/maps/dir/?api=1&origin={quote_plus(origin)}&destination={quote_plus(site+', Uttarakhand')}&travelmode=driving"
 embed = f"https://www.google.com/maps/dir/{quote_plus(origin)}/{quote_plus(site+', Uttarakhand')}?output=embed"
-components.html(f"""<iframe src="{embed}" width="100%" height="430" style="border:0;border-radius:12px" allowfullscreen loading="lazy"></iframe>""", height=450)
+st.iframe(embed, height=450)
 st.link_button(f"🗺️ Open full route: {origin} → {site}", maps)
 st.caption("The embedded map shows the route in this page. Open the full route for live traffic and exact travel time.")
 
 with st.expander("See historical visitor pattern"):
-    st.pyplot(plot_historical_patterns(df, site, dt), use_container_width=True)
+    st.pyplot(plot_historical_patterns(df, site, dt), width="stretch")
