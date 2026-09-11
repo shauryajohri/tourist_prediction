@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shaant. Know the rush before you go.</title>
+<meta name="description" content="Pick a place in Uttarakhand and a date. Shaant tells you how busy it will be before you book anything. Runs in your browser, nothing to install.">
+<meta name="theme-color" content="#101826">
+<meta property="og:title" content="Shaant. Know the rush before you go.">
+<meta property="og:description" content="Pick a place in Uttarakhand and a date. See how busy it will be before you book anything.">
+<meta property="og:type" content="website">
+<!-- DEPLOY STEP: if this site is ever put online, add og:url and og:image here with the
+     full live address, for example https://yoursite.com/ and https://yoursite.com/assets/hero-poster.jpg
+     They are left out on purpose: a placeholder value shows a broken link preview. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101826'/%3E%3Cpath d='M4 22 L11 12 L15 17 L20 8 L28 22 Z' fill='%23f4816a'/%3E%3Cpath d='M4 25 h24' stroke='%237fd4d8' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..700&family=Karla:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ============================================================
+   SHAANT: design tokens
+   Palette sampled from a Himalayan dawn above the cloud deck:
+   deep cold blue in shadow, cloud white, alpenglow rose on snow.
+   ============================================================ */
+:root{
+  --canvas:#101826;
+  --canvas-deep:#0b111c;
+  --panel:#18222f;
+  --panel-hi:#1f2b3a;
+  --accent:#f4816a;
+  --accent-hover:#ff9b85;
+  --accent-muted:#6b3f38;
+  --cool:#7fd4d8;
+  --text-primary:#eaf0f7;
+  --text-secondary:#93a4ba;
+  --line:#2a3646;
+  --line-strong:#3d4d61;
+
+  --display:'Archivo',system-ui,sans-serif;
+  --body:'Karla',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-soft:cubic-bezier(.4,0,.2,1);
+
+  --tshadow:0 1px 2px rgba(5,5,10,.95),0 3px 12px rgba(5,5,10,.78),0 10px 44px rgba(5,5,10,.8);
+  --maxw:1180px;
+}
+
+*{box-sizing:border-box}
+html,body{overflow-x:hidden;overflow-x:clip}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--canvas);color:var(--text-primary);
+  font-family:var(--body);font-size:17px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%}
+h1,h2,h3{font-family:var(--display);font-variation-settings:'wdth' 118;line-height:1.05;margin:0;letter-spacing:-.015em}
+p{margin:0}
+a{color:inherit}
+
+.skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--accent);color:#1a0d0a;
+  padding:12px 20px;border-radius:0 0 10px 0;font-weight:600}
+.skip:focus{left:0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px}
+
+/* ---------- the one fixed environment layer ---------- */
+.env{position:fixed;inset:0;z-index:0;pointer-events:none}
+.env::before{
+  content:"";position:absolute;inset:-20%;
+  background:
+    radial-gradient(60% 45% at 22% 12%,rgba(244,129,106,.10),transparent 62%),
+    radial-gradient(55% 40% at 82% 72%,rgba(127,212,216,.075),transparent 64%),
+    radial-gradient(80% 60% at 50% 108%,rgba(31,43,58,.5),transparent 70%);
+  animation:envdrift 96s var(--ease-soft) -22s infinite alternate;
+}
+.env::after{
+  content:"";position:absolute;inset:0;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes envdrift{from{transform:translate3d(-2.2%,-1.4%,0) scale(1.04)}to{transform:translate3d(2.4%,1.8%,0) scale(1.1)}}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:90;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px 28px;
+  background:linear-gradient(to bottom,rgba(11,17,28,.86),rgba(11,17,28,0));
+  backdrop-filter:blur(3px)}
+.brand{display:flex;align-items:baseline;gap:10px;font-family:var(--display);
+  font-variation-settings:'wdth' 122;font-weight:700;font-size:19px;letter-spacing:.01em;
+  text-decoration:none}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent);
+  display:inline-block;flex:none;translate:0 -2px}
+.brand span{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text-secondary);
+  letter-spacing:.14em;text-transform:uppercase}
+.navlinks{display:flex;align-items:center;gap:26px;font-size:14.5px}
+.navlinks a{color:var(--text-secondary);text-decoration:none;transition:color .35s var(--ease)}
+.navlinks a:hover{color:var(--text-primary)}
+@media (max-width:860px){.navlinks a:not(.btn-sm){display:none}}
+.btn-sm{background:var(--accent);color:#1a0d0a !important;padding:9px 17px;border-radius:999px;
+  font-weight:600;font-size:14px;white-space:nowrap;flex:none;
+  transition:background .35s var(--ease),transform .35s var(--ease)}
+.btn-sm:hover{background:var(--accent-hover);transform:translateY(-1px)}
+@media (max-width:560px){
+  .nav{padding:12px 16px}
+  .brand{font-size:17px}
+  .brand span{display:none}
+  .btn-sm{padding:9px 14px;font-size:13.5px}
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{position:relative;height:700vh;z-index:1}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--canvas-deep)}
+
+/* the drawn dawn scene: layered, parallaxed by hero progress */
+.scene{position:absolute;inset:0}
+.lyr{position:absolute;inset:0;will-change:transform}
+.lyr svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.l-sky{transform:scale(calc(1 + var(--hp,0) * .06))}
+.l-peaks{transform:translateY(calc(var(--hp,0) * 16%)) scale(calc(1 + var(--hp,0) * .30))}
+.l-cloud{transform:translateY(calc(var(--hp,0) * -62%)) scale(calc(1 + var(--hp,0) * 1.35));
+  opacity:calc(1 - var(--hp,0) * .55)}
+.l-valley{transform:translateY(calc(34% - var(--hp,0) * 34%));opacity:calc(.15 + var(--hp,0) * .85)}
+.l-fog{opacity:calc(.5 - var(--hp,0)*.28);animation:fogdrift 74s linear -12s infinite}
+@keyframes fogdrift{from{transform:translate3d(-4%,0,0)}to{transform:translate3d(4%,0,0)}}
+
+/* the video, when one exists. Layers over the drawn scene. */
+#hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity 1.1s var(--ease);will-change:transform;transform:translateZ(0)}
+.stage.video-ready #hero{opacity:1}
+.stage.video-ready .scene{opacity:0;transition:opacity 1.1s var(--ease)}
+
+/* 1. the global base scrim */
+.scrim{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 90% at 50% 45%,rgba(10,10,18,0) 35%,rgba(10,10,18,.62) 100%)}
+.scrim-b{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(11,17,28,.55) 0%,rgba(11,17,28,0) 24%,rgba(11,17,28,0) 62%,rgba(11,17,28,.72) 100%)}
+
+/* loading ring, only used when a video is actually being streamed */
+.ring{position:absolute;left:50%;bottom:46px;translate:-50% 0;width:44px;height:44px;
+  color:var(--text-secondary);opacity:0;transition:opacity .5s var(--ease);pointer-events:none}
+.ring.on{opacity:.85}
+.ring circle{transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .18s linear}
+
+/* caption bands */
+.bands{position:absolute;inset:0;pointer-events:none}
+.band{position:absolute;left:0;right:0;opacity:0;text-shadow:var(--tshadow)}
+.band::before{content:"";position:absolute;inset:-6% -8%;pointer-events:none;
+  opacity:calc(.25 + .75*var(--k,1));
+  background:radial-gradient(ellipse 74% 62% at 50% 50%,rgba(5,5,10,.68) 0%,rgba(5,5,10,.46) 46%,rgba(5,5,10,0) 76%)}
+.band .in{position:relative}
+.band .btn{text-shadow:none}
+
+.b1,.b2,.b3{top:50%;translate:0 -50%}
+.b4{top:50%;translate:0 -50%}
+.band .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cool);margin-bottom:16px}
+.band h2,.band .h{font-family:var(--display);font-variation-settings:'wdth' 116;font-weight:700;
+  font-size:clamp(34px,6.1vw,80px);line-height:1.02;max-width:19ch}
+.band .sub{margin-top:18px;font-size:clamp(16px,1.9vw,21px);color:#d3dce8;max-width:36ch;line-height:1.5}
+
+/* the action lane is the centre of frame, so words flank it */
+.b1 .in,.b3 .in{margin-left:6%;max-width:min(46%,620px)}
+.b2 .in{margin-left:auto;margin-right:6%;max-width:min(46%,620px);text-align:right}
+.b2 .h,.b2 .sub{margin-left:auto}
+.b4 .in{margin:0 auto;text-align:center;max-width:min(80%,860px)}
+.b4 .h{font-size:clamp(56px,11vw,150px);font-variation-settings:'wdth' 124;letter-spacing:-.03em;
+  max-width:none;margin:0 auto}
+.b4 .sub{margin:18px auto 0;max-width:30ch}
+@media (max-width:1080px){
+  .b1 .in,.b3 .in,.b2 .in{max-width:74%;margin-left:6%;margin-right:6%;text-align:left}
+  .b2 .in{margin-left:6%}.b2 .h,.b2 .sub{margin-left:0}
+}
+
+/* word / character split machinery */
+.w{display:inline-block;white-space:pre}
+.c{display:inline-block;will-change:transform,opacity}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* (a) scatter */
+.e-scatter .c{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.6,1);opacity:var(--kc);
+  transform:translate(calc((1 - var(--kc))*var(--jx,0px)),calc((1 - var(--kc))*var(--jy,0px)))
+            rotate(calc((1 - var(--kc))*var(--jr,0deg)))}
+/* (f) drift-down */
+.e-drift .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.8,1);opacity:var(--kc);
+  transform:translateY(calc((1 - var(--kc))*-26px))}
+/* (c) blur-to-sharp */
+.e-blur .soft{position:absolute;inset:0;filter:blur(11px);opacity:calc(1 - var(--k,0));
+  pointer-events:none}
+.e-blur .sharp{opacity:var(--k,0)}
+.e-blur{position:relative}
+/* (e) word-by-word rise into a staged settle */
+.e-rise .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.7,1);opacity:var(--kc);
+  transform:translateY(calc((1 - var(--kc))*22px))}
+.b4 .sub{opacity:var(--ks,0);transform:translateY(calc((1 - var(--ks,0))*14px))}
+.b4 .cta{opacity:var(--kb,0);transform:translateY(calc((1 - var(--kb,0))*14px))}
+
+.cta{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  background:var(--accent);color:#1a0d0a;border:0;border-radius:999px;
+  padding:15px 28px;font-family:var(--body);font-weight:600;font-size:16px;
+  text-decoration:none;cursor:pointer;pointer-events:auto;
+  transition:background .35s var(--ease),transform .35s var(--ease),box-shadow .35s var(--ease);
+  box-shadow:0 6px 26px rgba(244,129,106,.22)}
+.btn:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:0 10px 34px rgba(244,129,106,.3)}
+.btn.ghost{background:transparent;color:var(--text-primary);border:1px solid var(--line-strong);
+  box-shadow:none}
+.btn.ghost:hover{background:rgba(255,255,255,.05);border-color:var(--text-secondary)}
+@media (pointer:coarse){.btn,.btn-sm{min-height:44px;display:inline-flex;align-items:center;justify-content:center}}
+
+/* the static hero, for phones and reduced motion */
+.static-hero{display:none;position:relative;min-height:100vh;
+  align-items:center;overflow:hidden;background:var(--canvas-deep)}
+.static-hero .scene{position:absolute;inset:0}
+/* padding-block only: .wrap supplies the horizontal padding and must keep it */
+.static-hero .in{position:relative;z-index:3;padding-top:118px;padding-bottom:76px}
+.static-hero .h{font-family:var(--display);font-variation-settings:'wdth' 122;font-weight:700;
+  font-size:clamp(40px,10vw,74px);line-height:1.02;letter-spacing:-.025em;text-shadow:var(--tshadow)}
+.static-hero .sub{margin-top:20px;font-size:clamp(16px,4.4vw,20px);color:#d3dce8;max-width:32ch;
+  text-shadow:var(--tshadow)}
+.static-hero .cta{justify-content:flex-start;margin-top:30px}
+.static-hero .mark{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cool);margin-bottom:18px;text-shadow:var(--tshadow)}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+main{position:relative;z-index:2;background:var(--canvas)}
+/* the nav is fixed, so anchor jumps must land clear of it or the kicker hides behind it */
+section{position:relative;padding:110px 0;scroll-margin-top:86px}
+#main{scroll-margin-top:86px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cool);margin-bottom:18px}
+.h2{font-size:clamp(30px,4.4vw,52px);max-width:20ch}
+.lede{margin-top:20px;font-size:clamp(17px,2vw,20px);color:var(--text-secondary);max-width:56ch;line-height:1.6}
+
+/* the signature: drawn contour dividers */
+.contour{display:block;width:100%;height:74px;overflow:visible}
+.contour path{fill:none;stroke:var(--line-strong);stroke-width:1.2;
+  stroke-dasharray:var(--len,1400);stroke-dashoffset:var(--len,1400);
+  transition:stroke-dashoffset 1.9s var(--ease)}
+.contour path:nth-child(2){stroke:var(--accent-muted);transition-delay:.14s}
+.contour path:nth-child(3){stroke:var(--line);transition-delay:.28s}
+.contour.in path{stroke-dashoffset:0}
+
+/* entrances */
+.rise{opacity:0;transform:translateY(24px);
+  transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.in .rise,.rise.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(22px);
+  transition:opacity .85s var(--ease),transform .85s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(1){transition-delay:.05s}
+.stagger.in>*:nth-child(2){transition-delay:.17s}
+.stagger.in>*:nth-child(3){transition-delay:.29s}
+.stagger.in>*:nth-child(4){transition-delay:.41s}
+.stagger.in>*:nth-child(5){transition-delay:.53s}
+/* retire the stagger so later hovers do not lag. Must beat the nth-child specificity. */
+.stagger.done>*:nth-child(1),.stagger.done>*:nth-child(2),.stagger.done>*:nth-child(3),
+.stagger.done>*:nth-child(4),.stagger.done>*:nth-child(5),.stagger.done>*{transition-delay:0s !important}
+
+/* ---------- the planner ---------- */
+#plan{padding-top:96px}
+.plan-shell{position:relative;border:1px solid var(--line);border-radius:22px;
+  background:linear-gradient(180deg,var(--panel) 0%,rgba(24,34,47,.55) 100%);
+  padding:34px;overflow:hidden}
+.plan-shell::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='420' viewBox='0 0 900 420'%3E%3Cg fill='none' stroke='%232a3646' stroke-width='1'%3E%3Cpath d='M0 96 C160 62 300 128 452 100 604 72 742 130 900 96'/%3E%3Cpath d='M0 150 C170 116 306 182 452 154 598 126 738 184 900 150'/%3E%3Cpath d='M0 204 C180 170 312 236 452 208 592 180 734 238 900 204'/%3E%3Cpath d='M0 258 C190 224 318 290 452 262 586 234 730 292 900 258'/%3E%3Cpath d='M0 312 C200 278 324 344 452 316 580 288 726 346 900 312'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:cover;background-position:center}
+.plan-shell>*{position:relative}
+
+.form{display:grid;grid-template-columns:1.05fr 1.15fr .95fr auto;gap:16px;align-items:end;margin-top:26px}
+@media (max-width:960px){.form{grid-template-columns:1fr 1fr}.form .go{grid-column:1/-1}}
+@media (max-width:560px){.form{grid-template-columns:1fr}}
+.field label{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text-secondary);margin-bottom:9px}
+.field input,.field select{width:100%;background:var(--canvas-deep);color:var(--text-primary);
+  border:1px solid var(--line-strong);border-radius:12px;padding:14px 15px;
+  font-family:var(--body);font-size:16px;min-height:52px;
+  transition:border-color .3s var(--ease),background .3s var(--ease)}
+.field input:hover,.field select:hover{border-color:var(--text-secondary)}
+.field select{appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2393a4ba' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:38px}
+.go .btn{width:100%;min-height:52px}
+
+/* result */
+.result{margin-top:30px;opacity:0;transform:translateY(16px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.result.on{opacity:1;transform:none}
+.result[hidden]{display:none}
+.verdict{display:flex;align-items:flex-start;gap:26px;flex-wrap:wrap;
+  padding-bottom:26px;border-bottom:1px solid var(--line)}
+.meter{flex:none;width:132px;height:96px}
+.meter path{fill:none;stroke-width:2.4;stroke-linecap:round;opacity:.22;
+  transition:opacity .6s var(--ease),stroke .6s var(--ease)}
+.meter path.lit{opacity:1}
+.vtext{flex:1;min-width:250px}
+.vtext .state{font-family:var(--display);font-variation-settings:'wdth' 120;font-weight:700;
+  font-size:clamp(30px,4.4vw,46px);line-height:1.05}
+.vtext .say{margin-top:10px;color:var(--text-secondary);font-size:17px;max-width:44ch}
+.vwhen{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text-secondary);margin-bottom:12px}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:26px}
+.tile{background:var(--panel);padding:18px 20px}
+.tile .lab{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-secondary)}
+.tile .val{font-family:var(--display);font-variation-settings:'wdth' 112;font-weight:600;
+  font-size:26px;margin-top:7px;line-height:1.15}
+.tile .val.sm{font-size:19px;font-weight:500}
+
+.honest{margin-top:20px;display:flex;gap:12px;align-items:flex-start;
+  background:rgba(127,212,216,.055);border:1px solid rgba(127,212,216,.2);
+  border-radius:12px;padding:15px 17px;font-size:14.5px;color:#b9c7d8;line-height:1.55}
+.honest svg{flex:none;margin-top:2px}
+
+.blockhead{font-family:var(--mono);font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text-secondary);margin:34px 0 15px}
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{background:rgba(255,255,255,.045);border:1px solid var(--line-strong);border-radius:999px;
+  padding:8px 15px;font-size:14.5px}
+.chip.day{font-family:var(--mono);font-size:13.5px;cursor:pointer;
+  transition:border-color .3s var(--ease),background .3s var(--ease),color .3s var(--ease)}
+.chip.day:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.08)}
+
+/* ---------- spot cards ---------- */
+.spots{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:14px}
+.spot{position:relative;display:flex;flex-direction:column;
+  background:var(--canvas-deep);border:1px solid var(--line);border-radius:14px;
+  padding:17px 18px 15px;overflow:hidden;
+  transition:border-color .4s var(--ease),transform .4s var(--ease),background .4s var(--ease)}
+.spot:hover{border-color:var(--line-strong);transform:translateY(-3px);background:var(--panel)}
+/* the contour motif, carried through to the smallest card */
+.spot::before{content:"";position:absolute;right:-30px;top:-26px;width:120px;height:88px;
+  pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='88'%3E%3Cg fill='none' stroke='%232a3646' stroke-width='1'%3E%3Cpath d='M0 20 C26 8 50 30 74 20 94 12 108 24 120 18'/%3E%3Cpath d='M0 36 C28 24 52 46 76 36 96 28 110 40 120 34'/%3E%3Cpath d='M0 52 C30 40 54 62 78 52 98 44 112 56 120 50'/%3E%3C/g%3E%3C/svg%3E")}
+.spot>*{position:relative}
+.spot .top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.spot h4{margin:0;font-family:var(--display);font-variation-settings:'wdth' 110;font-weight:600;
+  font-size:16.5px;line-height:1.22;letter-spacing:-.005em}
+.spot .km{flex:none;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  color:var(--cool);white-space:nowrap;padding-top:2px}
+.spot .km.here{color:var(--text-secondary)}
+.spot p{margin:9px 0 0;font-size:14px;line-height:1.5;color:var(--text-secondary)}
+.spot .dir{margin-top:auto;padding-top:13px;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text-secondary);
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px;align-self:flex-start;
+  transition:color .3s var(--ease)}
+.spot .dir:hover{color:var(--accent)}
+.spot .dir svg{transition:transform .3s var(--ease)}
+.spot .dir:hover svg{transform:translate(2px,-2px)}
+@media (pointer:coarse){.spot .dir{min-height:44px;align-items:center}}
+.note{font-size:13px;color:var(--text-secondary);margin-top:14px;line-height:1.5}
+
+/* month strip */
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:6px;align-items:end;height:118px;margin-top:4px}
+.mo{display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:7px;cursor:default}
+.mo .bar{border-radius:5px 5px 3px 3px;background:var(--line-strong);
+  transition:height .8s var(--ease),background .5s var(--ease)}
+.mo.busy .bar{background:var(--accent)}
+.mo.quiet .bar{background:var(--cool)}
+.mo.here .bar{outline:2px solid var(--text-primary);outline-offset:2px}
+.mo .ml{font-family:var(--mono);font-size:10.5px;color:var(--text-secondary);text-align:center}
+@media (max-width:640px){.mo .ml{font-size:9px}}
+
+.routerow{margin-top:30px;display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+
+/* ---------- meaning cards ---------- */
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:20px;margin-top:46px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;
+  position:relative;overflow:hidden;transition:border-color .45s var(--ease),transform .45s var(--ease)}
+.card:hover{border-color:var(--line-strong);transform:translateY(-3px)}
+.card .dot{width:11px;height:11px;border-radius:50%;background:var(--text-primary);margin-bottom:17px}
+.card.q .dot{background:var(--cool)}
+.card.b .dot{background:var(--accent)}
+.card h3{font-size:24px;font-variation-settings:'wdth' 114}
+.card p{margin-top:11px;color:var(--text-secondary);font-size:16px}
+/* corner glow, kept out from under the copy */
+.card::after{content:"";position:absolute;right:-46px;bottom:-52px;width:132px;height:132px;
+  border-radius:50%;opacity:.09;background:var(--text-primary);
+  animation:pulse 7s var(--ease-soft) -2s infinite alternate}
+@media (max-width:560px){.card::after{width:96px;height:96px;right:-40px;bottom:-40px}}
+.card.q::after{background:var(--cool)}
+.card.b::after{background:var(--accent)}
+@keyframes pulse{from{transform:scale(.86);opacity:.06}to{transform:scale(1.1);opacity:.14}}
+
+/* ---------- quieter places ---------- */
+.places{display:grid;grid-template-columns:repeat(auto-fit,minmax(262px,1fr));gap:20px;margin-top:46px}
+.place{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--panel);
+  transition:border-color .45s var(--ease),transform .45s var(--ease)}
+.place:hover{border-color:var(--line-strong);transform:translateY(-3px)}
+.place .art{height:158px;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.place .art svg{position:absolute;inset:0;width:100%;height:100%}
+.place .txt{padding:22px 24px 26px}
+.place h3{font-size:22px;font-variation-settings:'wdth' 114}
+.place .alt{font-family:var(--mono);font-size:11.5px;color:var(--cool);letter-spacing:.1em;margin-top:7px}
+.place p{margin-top:11px;color:var(--text-secondary);font-size:15.5px}
+
+/* ---------- built ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:44px}
+.stat{background:var(--panel);padding:26px 22px}
+.stat .n{font-family:var(--display);font-variation-settings:'wdth' 118;font-weight:700;
+  font-size:clamp(30px,4vw,42px);line-height:1}
+.stat .l{font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-secondary);margin-top:10px}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px}
+@media (max-width:860px){.twocol{grid-template-columns:1fr;gap:26px}}
+.twocol p{color:var(--text-secondary);font-size:16.5px}
+.caveat{margin-top:44px;border:1px solid var(--accent-muted);border-radius:18px;
+  background:rgba(244,129,106,.045);padding:30px}
+.caveat h3{font-size:22px;color:var(--accent);font-variation-settings:'wdth' 112}
+.caveat p{margin-top:13px;color:#c6d0dd;font-size:16.5px;max-width:70ch}
+
+/* ---------- faq ---------- */
+.faq{margin-top:44px;border-top:1px solid var(--line)}
+.qa{border-bottom:1px solid var(--line)}
+.qa summary{cursor:pointer;list-style:none;padding:24px 44px 24px 0;position:relative;
+  font-family:var(--display);font-variation-settings:'wdth' 110;font-weight:600;font-size:19.5px;
+  transition:color .3s var(--ease)}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary:hover{color:var(--accent)}
+.qa summary::after{content:"";position:absolute;right:6px;top:50%;width:12px;height:12px;
+  border-right:1.8px solid var(--text-secondary);border-bottom:1.8px solid var(--text-secondary);
+  translate:0 -60%;rotate:45deg;transition:rotate .35s var(--ease),border-color .3s var(--ease)}
+.qa[open] summary::after{rotate:225deg;translate:0 -30%;border-color:var(--accent)}
+.qa .a{padding:0 8px 26px 0;color:var(--text-secondary);font-size:16.5px;max-width:74ch}
+
+/* ---------- close ---------- */
+#go{text-align:center;padding:130px 0 120px}
+#go .h2{margin:0 auto;max-width:17ch}
+#go .lede{margin:20px auto 0}
+#go .cta{margin-top:34px}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:52px 0 62px;position:relative;z-index:2;
+  background:var(--canvas-deep)}
+.frow{display:flex;justify-content:space-between;gap:26px;flex-wrap:wrap;align-items:flex-start}
+footer p{color:var(--text-secondary);font-size:14.5px;max-width:46ch;line-height:1.6}
+footer .fine{margin-top:9px;font-size:13.5px;color:#6f8098}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+  .rise,.stagger>*{opacity:1 !important;transform:none !important}
+  .contour path{stroke-dashoffset:0 !important}
+  .result{opacity:1 !important;transform:none !important}
+  .b4 .sub,.b4 .cta{opacity:1 !important;transform:none !important}
+}
+/* pause everything when the tab is hidden */
+body.paused *,body.paused *::before,body.paused *::after{animation-play-state:paused !important}
+
+/* ---------- the five static-hero gates ---------- */
+@media (max-width:720px),
+       (orientation:portrait) and (max-width:1024px),
+       (orientation:portrait) and (pointer:coarse),
+       (orientation:landscape) and (pointer:coarse) and (max-height:560px),
+       (prefers-reduced-motion:reduce){
+  .hero{display:none}
+  .static-hero{display:flex}
+}
+/* short desktop windows keep the scrub but lose the small overlays */
+@media (max-height:560px){.ring{display:none}}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to the planner</a>
+<div class="env" aria-hidden="true"></div>
+
+<nav class="nav">
+  <a class="brand" href="#top"><i aria-hidden="true"></i>Shaant<span>Uttarakhand</span></a>
+  <div class="navlinks">
+    <a href="#meaning">Reading it</a>
+    <a href="#quieter">Quieter places</a>
+    <a href="#built">How it works</a>
+    <a href="#faq">Questions</a>
+    <a class="btn-sm" href="#plan">Check your date</a>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<!-- ===================== THE SCROLL HERO ===================== -->
+<div class="hero" id="hero-region">
+  <div class="stage" id="stage">
+    <div class="scene" id="scene" aria-hidden="true"></div>
+    <video id="hero" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="scrim-b" aria-hidden="true"></div>
+
+    <svg class="ring" id="ring" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/>
+    </svg>
+
+    <div class="bands" id="bands">
+      <div class="band b1 e-drift" data-a="0" data-b="0.20">
+        <div class="in">
+          <h1 class="h" data-split="word">You planned the mountains.</h1>
+          <p class="sub">Nobody plans the traffic.</p>
+        </div>
+      </div>
+      <div class="band b2 e-scatter" data-a="0.26" data-b="0.46" data-spread="0.42">
+        <div class="in">
+          <p class="h" data-split="char">Nainital. A Saturday in May.</p>
+          <p class="sub">Two kilometres of standstill. Rooms gone by noon.</p>
+        </div>
+      </div>
+      <div class="band b3 e-blur" data-a="0.52" data-b="0.70">
+        <div class="in">
+          <p class="h sharp">The mountain was never the problem.</p>
+          <p class="h soft" aria-hidden="true">The mountain was never the problem.</p>
+        </div>
+      </div>
+      <div class="band b4 e-rise" data-a="0.76" data-b="1" data-ramp="0.034">
+        <div class="in">
+          <p class="h" data-split="word">Shaant</p>
+          <p class="sub">Know the rush before you go.</p>
+          <div class="cta">
+            <a class="btn" href="#plan">Check your date</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== THE STATIC HERO ===================== -->
+<header class="static-hero">
+  <div class="scene" id="scene-static" aria-hidden="true"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="scrim-b" aria-hidden="true"></div>
+  <div class="wrap in">
+    <p class="mark">Uttarakhand</p>
+    <h1 class="h">Know the rush before you go.</h1>
+    <p class="sub">Pick a place in Uttarakhand and a date. See how busy it will be before you book anything.</p>
+    <div class="cta"><a class="btn" href="#plan">Check your date</a></div>
+  </div>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- ===================== THE PLANNER ===================== -->
+  <section id="plan">
+    <div class="wrap">
+      <div class="rise">
+        <p class="kicker">The planner</p>
+        <h2 class="h2">Where are you going, and when?</h2>
+        <p class="lede">Three answers and you are done. It works right here in your browser, with nothing to install.</p>
+      </div>
+
+      <div class="plan-shell rise" style="margin-top:40px">
+        <form class="form" id="form" novalidate>
+          <div class="field">
+            <label for="origin">Starting from</label>
+            <input id="origin" type="text" value="New Delhi" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label for="site">Going to</label>
+            <select id="site"></select>
+          </div>
+          <div class="field">
+            <label for="date">Travel date</label>
+            <input id="date" type="date">
+          </div>
+          <div class="field go">
+            <button class="btn" type="submit">Show me the rush</button>
+          </div>
+        </form>
+
+        <div class="result" id="result" hidden>
+          <div class="verdict">
+            <svg class="meter" id="meter" viewBox="0 0 132 96" aria-hidden="true">
+              <path id="m-busy"  d="M8 26 C34 10 62 40 90 24 108 14 118 22 124 20" stroke="#f4816a"/>
+              <path id="m-steady" d="M8 50 C34 34 62 64 90 48 108 38 118 46 124 44" stroke="#eaf0f7"/>
+              <path id="m-quiet"  d="M8 74 C34 58 62 88 90 72 108 62 118 70 124 68" stroke="#7fd4d8"/>
+            </svg>
+            <div class="vtext">
+              <p class="vwhen" id="r-when"></p>
+              <p class="state" id="r-state"></p>
+              <p class="say" id="r-say"></p>
+            </div>
+          </div>
+
+          <div class="tiles">
+            <div class="tile"><p class="lab">Rush</p><p class="val" id="r-rush"></p></div>
+            <div class="tile"><p class="lab">Expected visitors</p><p class="val" id="r-vis"></p></div>
+            <div class="tile"><p class="lab">Confidence</p><p class="val" id="r-conf"></p></div>
+            <div class="tile"><p class="lab">Typical weather</p><p class="val sm" id="r-clim"></p></div>
+          </div>
+
+          <div class="honest">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" stroke="#7fd4d8" stroke-width="1.3"/>
+              <path d="M8 4.6v4.2M8 11.2v.5" stroke="#7fd4d8" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <p>These visitor figures come from a sample dataset while real records are being added, so treat them as a guide to the season rather than a headcount.</p>
+          </div>
+
+          <p class="blockhead">Rush across the year</p>
+          <div class="months" id="months"></div>
+          <p style="font-size:13.5px;color:var(--text-secondary);margin-top:12px" id="mo-help">Cyan is quiet, rose is busy. Your month is outlined.</p>
+
+          <p class="blockhead">Quieter days near your date</p>
+          <div class="chips" id="quieter-days"></div>
+
+          <p class="blockhead">Worth seeing there</p>
+          <div class="spots" id="r-spots"></div>
+          <p class="note" id="spots-note"></p>
+
+          <p class="blockhead">Rooms, roughly</p>
+          <div class="tiles">
+            <div class="tile"><p class="lab">Budget</p><p class="val sm">₹800 to ₹2,000 a night</p></div>
+            <div class="tile"><p class="lab">Comfortable</p><p class="val sm">₹2,000 to ₹5,000 a night</p></div>
+            <div class="tile"><p class="lab">Premium</p><p class="val sm">₹5,000 and up</p></div>
+          </div>
+          <p style="font-size:13.5px;color:var(--text-secondary);margin-top:12px">Indicative ranges, not live quotes. Prices climb on weekends and in the busy months.</p>
+
+          <div class="routerow">
+            <a class="btn ghost" id="r-route" href="#" target="_blank" rel="noopener">Open the drive in Google Maps</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <svg class="contour" viewBox="0 0 1400 74" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 22 C230 4 420 46 640 28 860 10 1080 50 1400 26"/>
+    <path d="M0 42 C240 24 430 66 650 48 870 30 1090 70 1400 46"/>
+    <path d="M0 62 C250 44 440 86 660 68 880 50 1100 90 1400 66"/>
+  </svg>
+
+  <!-- ===================== WHAT THE ANSWER MEANS ===================== -->
+  <section id="meaning">
+    <div class="wrap">
+      <div class="rise">
+        <p class="kicker">Reading it</p>
+        <h2 class="h2">Three answers, and what each one costs you.</h2>
+      </div>
+      <div class="cards3 stagger">
+        <article class="card q">
+          <div class="dot" aria-hidden="true"></div>
+          <h3>Quiet</h3>
+          <p>Roads move. Rooms are cheap and available. You will hear the river.</p>
+        </article>
+        <article class="card">
+          <div class="dot" aria-hidden="true"></div>
+          <h3>Steady</h3>
+          <p>Normal numbers. Book a day or two ahead and you are fine.</p>
+        </article>
+        <article class="card b">
+          <div class="dot" aria-hidden="true"></div>
+          <h3>Busy</h3>
+          <p>Queues at the viewpoints, slow roads, and rooms priced for people with no choice.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUIETER PLACES ===================== -->
+  <section id="quieter">
+    <div class="wrap">
+      <div class="rise">
+        <p class="kicker">The other way</p>
+        <h2 class="h2">Move the date, or move the place.</h2>
+        <p class="lede">The busiest spots have quiet twins a few hours further on. Same mountains, a tenth of the people.</p>
+      </div>
+      <div class="places stagger" id="places-grid"></div>
+    </div>
+  </section>
+
+  <svg class="contour" viewBox="0 0 1400 74" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 26 C210 48 400 6 620 24 840 42 1070 4 1400 30"/>
+    <path d="M0 46 C220 68 410 26 630 44 850 62 1080 24 1400 50"/>
+    <path d="M0 66 C230 88 420 46 640 64 860 82 1090 44 1400 70"/>
+  </svg>
+
+  <!-- ===================== HOW IT WAS BUILT ===================== -->
+  <section id="built">
+    <div class="wrap">
+      <div class="rise">
+        <p class="kicker">Under the hood</p>
+        <h2 class="h2">A trained model, running inside a web page.</h2>
+      </div>
+      <div class="stats stagger">
+        <div class="stat"><p class="n">29</p><p class="l">destinations</p></div>
+        <div class="stat"><p class="n">74,153</p><p class="l">daily records</p></div>
+        <div class="stat"><p class="n">853</p><p class="l">dates answered</p></div>
+        <div class="stat"><p class="n">0</p><p class="l">things to install</p></div>
+      </div>
+      <div class="twocol rise">
+        <p>The prediction comes from a gradient boosted classifier trained on seven years of daily records for 29 destinations. It learns from the month, the day of the week, whether the date is a public holiday, and how busy that destination has been on that calendar day in the past.</p>
+        <p>Normally a model like that needs Python and a terminal. This one does not. Every answer it can give was worked out ahead of time and packed into the page, so the whole thing runs in your browser with nothing to install and nothing to wait for.</p>
+      </div>
+      <div class="caveat rise">
+        <h3>What it cannot do yet</h3>
+        <p>The dataset behind this is sample data, not real gate counts. Every destination in it moves almost identically, so the model can tell a busy month from a quiet one but cannot yet tell Nainital apart from Auli. Real visitor records would fix that without changing a line of the page you are looking at.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section id="faq">
+    <div class="wrap">
+      <div class="rise">
+        <p class="kicker">Questions</p>
+        <h2 class="h2">The things people ask before they book.</h2>
+      </div>
+      <div class="faq">
+        <details class="qa"><summary>When is the best time to go?</summary>
+          <div class="a">March to April and mid September to mid October are the clear winners. Skies are open, the temperature is kind, and the roads behave. June to August is monsoon, which means landslides and blocked roads, though it also means cheap rooms and empty viewpoints if you can be flexible.</div>
+        </details>
+        <details class="qa"><summary>Is a long weekend really that bad?</summary>
+          <div class="a">Yes. On the last big one, police only let cars into Nainital through the Rusi bypass if they could show a confirmed hotel booking, and the queue to get in ran two kilometres.</div>
+        </details>
+        <details class="qa"><summary>Should I just go somewhere quieter instead?</summary>
+          <div class="a">Often, yes. Chopta, Munsiyari and Mukteshwar sit a few hours further out and stay calm in the same weeks that Mall Road fills up.</div>
+        </details>
+        <details class="qa"><summary>What about winter?</summary>
+          <div class="a">December and January bring snow and closed roads in the higher reaches. Go, but keep a spare day in the plan so a blocked pass does not end the trip.</div>
+        </details>
+        <details class="qa"><summary>How accurate is this?</summary>
+          <div class="a">Honest answer: it reads the season well and it cannot yet read the destination. The numbers come from sample data while real records are added. Use it to pick a month and a weekday, not to count heads.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CLOSE ===================== -->
+  <section id="go">
+    <div class="wrap rise">
+      <h2 class="h2">The mountains will wait. The crowd will not.</h2>
+      <p class="lede">Take ten seconds now and save yourself a Saturday.</p>
+      <div class="cta"><a class="btn" href="#plan">Check your date</a></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap frow">
+    <div>
+      <p>Shaant. Built on Uttarakhand tourism records with a gradient boosted model.</p>
+      <p class="fine">Nothing you type here is sent anywhere. The planner runs entirely in your browser.</p>
+    </div>
+    <p class="fine">Imagery generated. Visitor figures from sample data.</p>
+  </div>
+</footer>
+
+<script src="assets/places.js"></script>
+<script src="assets/data.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   0. Static content: the 29 destinations
+   ============================================================ */
+/* The destinations live in assets/places.js, shared with place.html.
+   Each spot is [name, approximate km from the town centre, one line about it]. */
+var SITES = window.PLACES;
+
+var CLIMATE = {
+ 1:["Cool and dry",8,20], 2:["Pleasant",10,23], 3:["Mild",14,27], 4:["Warm",18,31],
+ 5:["Warm",21,34], 6:["Monsoon begins",20,30], 7:["Rainy",19,28], 8:["Rainy",18,27],
+ 9:["Fresh after monsoon",17,27], 10:["Clear and cool",12,25], 11:["Cool",8,21], 12:["Cold",5,18]
+};
+
+var VERDICT = {
+  M:{state:"Quiet. This is a good day to go.", rush:"Quiet", cls:"quiet",
+     say:"Roads move. Rooms are cheap and available. You will hear the river."},
+  S:{state:"Steady. Normal numbers, nothing unusual.", rush:"Steady", cls:"steady",
+     say:"Book a day or two ahead and you are fine."},
+  O:{state:"Busy. Expect queues, and book your room early.", rush:"Busy", cls:"busy",
+     say:"Queues at the viewpoints, slow roads, and rooms priced for people with no choice."}
+};
+
+/* Each place gets its own silhouette, so no two cards read as the same stamp.
+   All three stay in cool tones on purpose: rose means "busy" everywhere on this
+   site, and these are the quiet option. */
+var QUIETER = [
+  {n:"Chopta", alt:"2,680 m", hue:[127,212,216],
+   t:"Meadows and pine at 2,680 m. Camps and guesthouses, no hotel strip. Quiet even in season.",
+   /* rolling bugyal meadows: two soft summits, no hard edges */
+   ridge:"M0 158 L0 114 C38 98 64 66 108 60 C152 54 178 92 222 86 C268 80 298 50 342 48 C374 47 388 74 400 84 L400 158 Z",
+   snow:null},
+  {n:"Munsiyari", alt:"2,200 m", hue:[168,190,222],
+   t:"The Panchachuli peaks fill the sky here. Long drive, almost nobody on it.",
+   /* the five Panchachuli peaks, tall and sharp */
+   ridge:"M0 158 L0 118 L46 74 L86 108 L134 52 L186 104 L232 44 L286 100 L330 66 L372 106 L400 88 L400 158 Z",
+   snow:"M232 44 L258 72 L244 79 L232 70 L220 79 L206 72 Z"},
+  {n:"Mukteshwar", alt:"2,286 m", hue:[146,199,178],
+   t:"Orchards, a 350 year old temple, and the cliff at Chauli Ki Jali. An hour past Nainital and a world quieter.",
+   /* the cliff at Chauli Ki Jali: high ground that falls away, then orchard slopes */
+   ridge:"M0 158 L0 72 C34 68 62 63 88 62 L114 62 L132 130 C174 120 208 127 252 113 C298 99 338 116 400 106 L400 158 Z",
+   snow:null}
+];
+
+var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* ============================================================
+   1. The drawn dawn scene (SVG, authored by hand)
+   ============================================================ */
+function sceneMarkup(){
+  return ''+
+  '<div class="lyr l-sky"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">'+
+    '<defs>'+
+      '<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">'+
+        '<stop offset="0" stop-color="#0a1020"/><stop offset=".42" stop-color="#16233a"/>'+
+        '<stop offset=".72" stop-color="#3a3f5c"/><stop offset=".88" stop-color="#8d6674"/>'+
+        '<stop offset="1" stop-color="#d69078"/></linearGradient>'+
+      '<radialGradient id="sun" cx=".5" cy=".5" r=".5">'+
+        '<stop offset="0" stop-color="#ffcba6" stop-opacity=".92"/>'+
+        '<stop offset=".45" stop-color="#f4816a" stop-opacity=".34"/>'+
+        '<stop offset="1" stop-color="#f4816a" stop-opacity="0"/></radialGradient>'+
+    '</defs>'+
+    '<rect width="1600" height="900" fill="url(#sky)"/>'+
+    '<circle cx="1090" cy="700" r="360" fill="url(#sun)"/>'+
+    '<g fill="#ffffff" opacity=".5">'+
+      '<circle cx="210" cy="120" r="1.5"/><circle cx="430" cy="70" r="1.1"/><circle cx="700" cy="150" r="1.3"/>'+
+      '<circle cx="980" cy="90" r="1"/><circle cx="1280" cy="160" r="1.4"/><circle cx="1470" cy="80" r="1.1"/>'+
+      '<circle cx="120" cy="260" r="1"/><circle cx="600" cy="240" r="1"/><circle cx="1380" cy="280" r="1.2"/>'+
+    '</g></svg></div>'+
+
+  '<div class="lyr l-peaks"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">'+
+    '<defs><linearGradient id="pk" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#f0a58c"/><stop offset=".3" stop-color="#9c8fa8"/>'+
+      '<stop offset="1" stop-color="#2c3a52"/></linearGradient></defs>'+
+    /* Irregular range: three dominant summits with asymmetric flanks and shoulders,
+       lesser peaks and foothills between them. Real ridgelines are never even. */
+    '<path fill="url(#pk)" opacity=".95" d="M0 618 L88 566 L138 592 L212 478 L266 530 L320 502 '+
+      'L404 374 L452 448 L490 424 L560 470 L642 396 L692 468 L744 440 L830 512 L902 432 L954 498 '+
+      'L1034 464 L1122 366 L1178 446 L1218 416 L1292 488 L1376 422 L1430 492 L1512 450 L1600 502 '+
+      'L1600 900 L0 900 Z"/>'+
+    '<path fill="#ffffff" opacity=".58" d="M1122 366 L1156 408 L1141 416 L1122 404 L1105 416 L1090 408 Z"/>'+
+    '<path fill="#ffffff" opacity=".52" d="M404 374 L436 412 L421 420 L404 409 L388 420 L373 412 Z"/>'+
+    '<path fill="#ffffff" opacity=".38" d="M642 396 L668 430 L656 437 L642 428 L628 437 L616 430 Z"/>'+
+    '</svg></div>'+
+
+  '<div class="lyr l-cloud"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">'+
+    '<defs><linearGradient id="cl" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#e8eef7" stop-opacity=".05"/>'+
+      '<stop offset=".35" stop-color="#dfe7f2" stop-opacity=".72"/>'+
+      '<stop offset="1" stop-color="#b9c6d8" stop-opacity=".95"/></linearGradient>'+
+      '<linearGradient id="cl2" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#ffd9c4" stop-opacity=".5"/>'+
+      '<stop offset="1" stop-color="#c3b1bd" stop-opacity=".8"/></linearGradient></defs>'+
+    '<path fill="url(#cl2)" d="M0 592 C150 556 250 610 400 584 C540 560 640 606 800 580 '+
+      'C950 556 1060 604 1210 578 C1350 554 1470 600 1600 574 L1600 900 L0 900 Z"/>'+
+    '<path fill="url(#cl)" d="M0 660 C170 622 280 678 440 652 C590 628 700 674 860 648 '+
+      'C1010 624 1130 672 1290 646 C1420 624 1500 664 1600 646 L1600 900 L0 900 Z"/>'+
+    '<g fill="#ffffff" opacity=".26">'+
+      '<ellipse cx="300" cy="700" rx="240" ry="42"/><ellipse cx="820" cy="742" rx="300" ry="48"/>'+
+      '<ellipse cx="1340" cy="706" rx="250" ry="40"/></g>'+
+    '</svg></div>'+
+
+  '<div class="lyr l-valley"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">'+
+    '<defs><linearGradient id="vl" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#243449"/><stop offset="1" stop-color="#0d1420"/></linearGradient>'+
+      '<linearGradient id="vr" x1="0" y1="0" x2="1" y2="0">'+
+      '<stop offset="0" stop-color="#9fb6c9" stop-opacity=".0"/>'+
+      '<stop offset=".5" stop-color="#c7d8e6" stop-opacity=".85"/>'+
+      '<stop offset="1" stop-color="#9fb6c9" stop-opacity=".0"/></linearGradient></defs>'+
+    /* mid slopes: rounded shoulders, softened by distance */
+    '<path fill="#38475e" opacity=".85" d="M0 900 L0 764 C74 746 126 694 196 684 '+
+      'C262 675 304 726 372 716 C440 706 476 654 548 648 C616 642 660 718 730 710 '+
+      'C800 702 838 650 908 646 C976 642 1018 716 1090 708 C1160 700 1198 654 1268 652 '+
+      'C1338 650 1382 712 1452 706 C1510 701 1552 676 1600 668 L1600 900 Z"/>'+
+    /* near valley walls: sharper, darker, closer */
+    '<path fill="url(#vl)" d="M0 900 L0 828 L164 754 L268 800 L392 738 L508 792 L618 742 '+
+      'L742 806 L868 748 L982 798 L1116 744 L1238 802 L1352 750 L1478 804 L1600 762 L1600 900 Z"/>'+
+    '<path fill="url(#vr)" opacity=".7" d="M600 900 C700 840 760 828 800 812 C840 828 900 840 1000 900 Z"/>'+
+    '</svg></div>'+
+
+  '<div class="lyr l-fog"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">'+
+    '<g fill="#dfe8f3" opacity=".2">'+
+      '<ellipse cx="380" cy="620" rx="420" ry="34"/><ellipse cx="1120" cy="666" rx="480" ry="30"/>'+
+      '<ellipse cx="760" cy="580" rx="360" ry="24"/></g></svg></div>';
+}
+document.getElementById('scene').innerHTML = sceneMarkup();
+document.getElementById('scene-static').innerHTML = sceneMarkup();
+/* the static hero shows the composed resting frame, so pin its scene to the arrival */
+document.getElementById('scene-static').style.setProperty('--hp','1');
+
+/* ============================================================
+   2. Text splitting, seeded so it is identical on every load
+   ============================================================ */
+function rng(seed){var s=seed>>>0;return function(){s=(s*1664525+1013904223)>>>0;return s/4294967296;};}
+
+function split(el, mode, spread){
+  var text = el.textContent, r = rng(text.length*7919 + mode.length);
+  var sr = document.createElement('span'); sr.className='sr'; sr.textContent=text;
+  var vis = document.createElement('span'); vis.setAttribute('aria-hidden','true');
+  var words = text.split(' '), total = 0, i, j;
+  for(i=0;i<words.length;i++) total += words[i].length;
+  var ci = 0;
+  for(i=0;i<words.length;i++){
+    var w = document.createElement('span'); w.className='w';
+    if(mode==='word'){
+      w.style.setProperty('--th', (i/Math.max(1,words.length))*0.5);
+      w.textContent = words[i] + (i<words.length-1?' ':'');
+    } else {
+      for(j=0;j<words[i].length;j++){
+        var c = document.createElement('span'); c.className='c';
+        c.style.setProperty('--th', (ci/Math.max(1,total))*(spread||0.4) + r()*0.06);
+        c.style.setProperty('--jx', ((r()*2-1)*54).toFixed(1)+'px');
+        c.style.setProperty('--jy', ((r()*2-1)*38).toFixed(1)+'px');
+        c.style.setProperty('--jr', ((r()*2-1)*16).toFixed(1)+'deg');
+        c.textContent = words[i][j];
+        w.appendChild(c); ci++;
+      }
+      if(i<words.length-1) w.appendChild(document.createTextNode(' '));
+    }
+    vis.appendChild(w);
+  }
+  el.textContent=''; el.appendChild(sr); el.appendChild(vis);
+}
+[].forEach.call(document.querySelectorAll('[data-split]'), function(el){
+  var band = el.closest('.band');
+  split(el, el.getAttribute('data-split'), band ? parseFloat(band.getAttribute('data-spread')||0.4) : 0.4);
+});
+
+/* ============================================================
+   3. The scrub hero
+   ============================================================ */
+/* Flip HAS_VIDEO to true the moment assets/hero-scrub.mp4 and assets/hero-poster.jpg
+   exist. Until then the drawn dawn scene carries the hero and the page requests
+   neither file, so the console stays clean. Nothing else has to change. */
+var HAS_VIDEO = false;
+var VIDEO_URL = 'assets/hero-scrub.mp4';
+var VIDEO_BYTES = 6000000;
+var POSTER_URL = 'assets/hero-poster.jpg';
+
+var heroRegion = document.getElementById('hero-region');
+var stage = document.getElementById('stage');
+var video = document.getElementById('hero');
+var ring  = document.getElementById('ring');
+var bandEls = [].slice.call(document.querySelectorAll('.band'));
+
+var bands = bandEls.map(function(el){
+  return {el:el, a:parseFloat(el.getAttribute('data-a')), b:parseFloat(el.getAttribute('data-b')),
+          ramp:parseFloat(el.getAttribute('data-ramp')||0)||0, op:-1, k:-1};
+});
+
+function heroProgress(){
+  if(!heroRegion.offsetParent && heroRegion.offsetHeight===0) return 0;
+  var rect = heroRegion.getBoundingClientRect();
+  var range = heroRegion.offsetHeight - window.innerHeight;
+  if(range<=0) return 0;
+  return Math.min(1, Math.max(0, -rect.top / range));
+}
+
+function smoothstep(p,e0,e1){var t=Math.min(1,Math.max(0,(p-e0)/(e1-e0)));return t*t*(3-2*t);}
+function clamp(v,lo,hi){return Math.min(hi,Math.max(lo,v));}
+
+var loadK = 0, loadStart = 0;
+function updateCaptions(p){
+  stage.style.setProperty('--hp', p.toFixed(4));
+  for(var i=0;i<bands.length;i++){
+    var B = bands[i], a = B.a, b = B.b;
+    var f = Math.min(0.02, (b-a)/3);
+    var inRamp  = (i===0) ? 1 : smoothstep(p,a,a+f);
+    var outRamp = (i===bands.length-1) ? 1 : (1 - smoothstep(p,b-f,b));
+    var op = inRamp*outRamp;
+    var k = clamp((p-a)/(B.ramp || Math.min(0.025,(b-a)*0.35)), 0, 1);
+    if(i===0) k = Math.max(k, loadK);
+    if(Math.abs(op-B.op) > 0.004){ B.el.style.opacity = op.toFixed(3); B.op = op; }
+    if(Math.abs(k-B.k) > 0.008){
+      B.el.style.setProperty('--k', k.toFixed(3));
+      if(i===bands.length-1){
+        B.el.style.setProperty('--ks', clamp((k-0.60)*3.4,0,1).toFixed(3));
+        B.el.style.setProperty('--kb', clamp((k-0.76)*4.6,0,1).toFixed(3));
+      }
+      B.k = k;
+    }
+  }
+}
+
+/* --- gated seeks --- */
+var seekBusy=false, pendingTime=null;
+function requestSeek(t){
+  if(!video.duration) return;
+  if(seekBusy){ pendingTime=t; return; }
+  seekBusy=true; video.currentTime=t;
+}
+video.addEventListener('seeked', function(){
+  seekBusy=false;
+  if(pendingTime!==null){var t=pendingTime; pendingTime=null; requestSeek(t);}
+});
+video.addEventListener('error', function(){ seekBusy=false; pendingTime=null; failVideo(); });
+
+/* --- the rAF loop that rests --- */
+var target=0, shown=0, rafId=null, lastTick=0, heroOnScreen=true;
+function tick(now){
+  var dt = Math.min(100, now-(lastTick||now)); lastTick=now;
+  var k=0.16;
+  shown += (target-shown)*(1-Math.pow(1-k, dt/16.667));
+  var settling = loadK < 1;
+  if(Math.abs(target-shown)<0.0005 && !settling){ shown=target; rafId=null; lastTick=0; }
+  else { rafId=requestAnimationFrame(tick); }
+  if(video.duration) requestSeek(shown*video.duration);
+  updateCaptions(shown);
+}
+function onScroll(){
+  target = heroProgress();
+  if(rafId===null && heroOnScreen) rafId=requestAnimationFrame(tick);
+}
+
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(es){
+    heroOnScreen = es[0].isIntersecting;
+    if(heroOnScreen && rafId===null && scrubOn) rafId=requestAnimationFrame(tick);
+  },{rootMargin:'10px'}).observe(heroRegion);
+}
+
+/* --- band one assembles once on load, then hands over to scroll --- */
+function runLoadRamp(){
+  loadStart = performance.now();
+  (function step(now){
+    loadK = clamp((now-loadStart)/1100, 0, 1);
+    updateCaptions(shown);
+    if(loadK<1) requestAnimationFrame(step);
+  })(performance.now());
+}
+
+/* --- the Blob loader --- */
+var started=false;
+function startBlobFetch(){
+  if(started) return; started=true;
+  loadHeroBlob().catch(failVideo);
+}
+function initHeroOnce(){
+  if(initHeroOnce.done) return; initHeroOnce.done=true;
+  runLoadRamp();
+  if(!HAS_VIDEO){ video.style.display='none'; return; }
+  var posterImg = new Image();
+  posterImg.onload = function(){
+    stage.style.backgroundImage = "url('"+POSTER_URL+"')";
+    startBlobFetch();
+  };
+  posterImg.onerror = startBlobFetch;
+  posterImg.src = POSTER_URL;
+  setTimeout(startBlobFetch, 4000);
+}
+function loadHeroBlob(){
+  return new Promise(function(resolve,reject){
+    if(location.protocol==='file:'){ reject(new Error('file protocol')); return; }
+    var ctrl = new AbortController();
+    var watchdog = setTimeout(function(){ctrl.abort();}, 20000);
+    fetch(VIDEO_URL,{priority:'low',signal:ctrl.signal}).then(function(res){
+      if(!res.ok) throw new Error('no video');
+      ring.classList.add('on');
+      var total = Number(res.headers.get('Content-Length')) || VIDEO_BYTES;
+      var reader = res.body.getReader(), chunks=[], got=0, lastRing=0;
+      function pump(){
+        return reader.read().then(function(r){
+          if(r.done){
+            clearTimeout(watchdog);
+            ring.style.setProperty('--ld',0);
+            ring.classList.remove('on');
+            video.src = URL.createObjectURL(new Blob(chunks));
+            video.load();
+            video.addEventListener('canplay', function(){
+              requestSeek(heroProgress()*video.duration);
+              stage.classList.add('video-ready');
+            },{once:true});
+            resolve(); return;
+          }
+          clearTimeout(watchdog);
+          watchdog = setTimeout(function(){ctrl.abort();}, 20000);
+          chunks.push(r.value); got += r.value.length;
+          var frac = Math.min(1, got/total), now = performance.now();
+          if(now-lastRing>100 || frac===1){
+            lastRing=now; ring.style.setProperty('--ld', Math.round(126*(1-frac)));
+          }
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function(e){ clearTimeout(watchdog); reject(e); });
+  });
+}
+function failVideo(){
+  ring.classList.remove('on');
+  stage.classList.add('video-failed');
+  video.style.display='none';
+}
+
+/* --- the five static-hero gates, kept live --- */
+var GATES = [
+  '(max-width: 720px)',
+  '(orientation: portrait) and (max-width: 1024px)',
+  '(orientation: portrait) and (pointer: coarse)',
+  '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  '(prefers-reduced-motion: reduce)'
+];
+var scrubOn=false;
+function enableScrub(){
+  if(scrubOn) return; scrubOn=true;
+  initHeroOnce();
+  window.addEventListener('scroll', onScroll, {passive:true});
+  bands.forEach(function(b){b.op=-1;b.k=-1;});
+  unpinFinalStates();
+  updateCaptions(heroProgress());
+  onScroll();
+}
+function disableScrub(){
+  if(!scrubOn) return; scrubOn=false;
+  window.removeEventListener('scroll', onScroll);
+  if(rafId!==null){ cancelAnimationFrame(rafId); rafId=null; }
+}
+function applyHeroMode(){
+  var hit=false;
+  for(var i=0;i<GATES.length;i++) if(matchMedia(GATES[i]).matches) hit=true;
+  if(hit) disableScrub(); else enableScrub();
+}
+var MQLS = GATES.map(function(q){return matchMedia(q);});
+MQLS.forEach(function(m){
+  if(m.addEventListener) m.addEventListener('change', applyHeroMode);
+  else if(m.addListener) m.addListener(applyHeroMode);
+});
+
+/* ============================================================
+   4. Reduced motion, honoured live and in both directions
+   ============================================================ */
+function pinToFinalStates(){
+  document.body.classList.add('pinned');
+  [].forEach.call(document.querySelectorAll('.contour'), function(c){c.classList.add('in');});
+  [].forEach.call(document.querySelectorAll('.rise,.stagger'), function(c){c.classList.add('in','done');});
+  bands.forEach(function(b){
+    b.el.style.opacity=1; b.el.style.setProperty('--k',1);
+    b.el.style.setProperty('--ks',1); b.el.style.setProperty('--kb',1);
+  });
+  var res = document.getElementById('result');
+  if(res && !res.hidden) res.classList.add('on');
+  if(rafId!==null){cancelAnimationFrame(rafId); rafId=null;}
+}
+function unpinFinalStates(){
+  document.body.classList.remove('pinned');
+  bands.forEach(function(b){
+    b.el.style.opacity=''; b.el.style.removeProperty('--k');
+    b.el.style.removeProperty('--ks'); b.el.style.removeProperty('--kb');
+    b.op=-1; b.k=-1;
+  });
+}
+var rmq = matchMedia('(prefers-reduced-motion: reduce)');
+function onRM(e){ if(e.matches) pinToFinalStates(); else applyHeroMode(); }
+if(rmq.addEventListener) rmq.addEventListener('change', onRM);
+else if(rmq.addListener) rmq.addListener(onRM);
+
+/* ============================================================
+   5. Entrances and the contour signature
+   ============================================================ */
+[].forEach.call(document.querySelectorAll('.contour path'), function(p){
+  var len = 1500;
+  try{ len = Math.ceil(p.getTotalLength()); }catch(e){}
+  p.style.setProperty('--len', len);
+});
+if('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if(e.target.classList.contains('stagger')){
+        setTimeout(function(){ e.target.classList.add('done'); }, 1400);
+      }
+      io.unobserve(e.target);
+    });
+  },{threshold:.16, rootMargin:'0px 0px -8% 0px'});
+  [].forEach.call(document.querySelectorAll('.rise,.stagger,.contour'), function(el){io.observe(el);});
+} else {
+  [].forEach.call(document.querySelectorAll('.rise,.stagger,.contour'), function(el){el.classList.add('in','done');});
+}
+
+/* pause every animation on a hidden tab */
+document.addEventListener('visibilitychange', function(){
+  document.body.classList.toggle('paused', document.hidden);
+});
+
+/* ============================================================
+   6. Quieter-places cards (drawn art, no image files)
+   ============================================================ */
+(function(){
+  var grid = document.getElementById('places-grid'), html='';
+  QUIETER.forEach(function(q,i){
+    var h = q.hue, c = 'rgb('+h[0]+','+h[1]+','+h[2]+')';
+    html += '<article class="place"><div class="art">'+
+      '<svg viewBox="0 0 400 158" preserveAspectRatio="none" aria-hidden="true">'+
+        '<defs><linearGradient id="pg'+i+'" x1="0" y1="0" x2="0" y2="1">'+
+          '<stop offset="0" stop-color="'+c+'" stop-opacity=".22"/>'+
+          '<stop offset="1" stop-color="'+c+'" stop-opacity=".03"/></linearGradient></defs>'+
+        '<rect width="400" height="158" fill="url(#pg'+i+')"/>'+
+        '<g fill="none" stroke="'+c+'" stroke-opacity=".5" stroke-width="1.1">'+
+          '<path d="M0 116 C70 96 120 128 190 110 260 92 320 122 400 104"/>'+
+          '<path d="M0 130 C74 110 124 142 194 124 264 106 324 136 400 118"/>'+
+          '<path d="M0 144 C78 124 128 156 198 138 268 120 328 150 400 132"/></g>'+
+        '<path fill="'+c+'" fill-opacity=".3" d="'+q.ridge+'"/>'+
+        (q.snow ? '<path fill="#eaf0f7" fill-opacity=".55" d="'+q.snow+'"/>' : '')+
+      '</svg></div>'+
+      '<div class="txt"><h3>'+q.n+'</h3><p class="alt">'+q.alt+'</p><p>'+q.t+'</p></div></article>';
+  });
+  grid.innerHTML = html;
+})();
+
+/* ============================================================
+   7. THE PLANNER
+   ============================================================ */
+var P = window.PRED;
+var START = new Date(P.start+'T00:00:00');
+var siteSel = document.getElementById('site');
+var dateIn  = document.getElementById('date');
+
+(function(){
+  var names = Object.keys(P.sites).sort(), html='';
+  for(var i=0;i<names.length;i++){
+    var meta = SITES[names[i]];
+    html += '<option value="'+names[i]+'"'+(names[i]==='Nainital'?' selected':'')+'>'+
+            names[i] + (meta? ' · '+meta.kind : '') + '</option>';
+  }
+  siteSel.innerHTML = html;
+})();
+
+function iso(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dayIndex(d){
+  return Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate()) -
+                     new Date(START.getFullYear(),START.getMonth(),START.getDate()))/86400000);
+}
+(function(){
+  var today = new Date(), lo = today > START ? today : START;
+  var hi = new Date(START.getTime()); hi.setDate(hi.getDate()+P.days-1);
+  dateIn.min = iso(lo); dateIn.max = iso(hi);
+  var def = new Date(lo.getTime()); def.setDate(def.getDate()+21);
+  if(def>hi) def = hi;
+  dateIn.value = iso(def);
+})();
+
+function lookup(site, d){
+  var i = dayIndex(d);
+  if(i<0 || i>=P.days) return null;
+  var S = P.sites[site];
+  if(!S) return null;
+  var vi = ((d.getMonth())*31 + (d.getDate()-1))*3;
+  return {
+    code: S.c.charAt(i),
+    conf: parseInt(S.p.substr(i*2,2),10),
+    vis:  parseInt(S.v.substr(vi,3),10),
+    monthly: S.m
+  };
+}
+
+var result = document.getElementById('result');
+var meterPaths = {O:document.getElementById('m-busy'),S:document.getElementById('m-steady'),M:document.getElementById('m-quiet')};
+
+function render(site, d, origin){
+  var r = lookup(site, d);
+  if(!r){ return; }
+  var V = VERDICT[r.code], meta = SITES[site] || {spots:[], kind:'', alt:null};
+  var cl = CLIMATE[d.getMonth()+1];
+
+  document.getElementById('r-when').textContent =
+    site + ' · ' + d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('r-state').textContent = V.state;
+  document.getElementById('r-say').textContent = V.say;
+  document.getElementById('r-rush').textContent = V.rush;
+  document.getElementById('r-vis').textContent = r.vis.toLocaleString('en-IN');
+  document.getElementById('r-conf').textContent = r.conf + '%';
+  document.getElementById('r-clim').textContent = cl[0] + ', ' + cl[1] + ' to ' + cl[2] + '°C';
+
+  for(var k in meterPaths) meterPaths[k].classList.toggle('lit', k===r.code);
+
+  /* spot cards: name, how far from the centre, one line, and a real map link */
+  var town = meta.hub || site;                       /* plain town name */
+  var spots = meta.spots || [];
+  var arrow = '<svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true">'+
+              '<path d="M2 8L8 2M8 2H3.5M8 2v4.5" stroke="currentColor" stroke-width="1.4" '+
+              'stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  document.getElementById('r-spots').innerHTML = spots.map(function(s){
+    var name = s[0], km = s[1], text = s[2];
+    /* a name that already names its own town is specific enough; the rest need the
+       town added, or "Sunset Point" and "Mall Road" land anywhere in India */
+    var query = (name.indexOf(',') > -1 ? name : name + ', ' + town) + ', Uttarakhand';
+    var href, label;
+    if(km === 0){
+      /* routing from the centre to the centre is useless, so show the pin instead */
+      href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+      label = 'View on map';
+    } else {
+      href = 'https://www.google.com/maps/dir/?api=1&origin=' + encodeURIComponent(town + ', Uttarakhand') +
+             '&destination=' + encodeURIComponent(query) + '&travelmode=driving';
+      label = 'Directions';
+    }
+    var far = km === 0 ? '<span class="km here">in the centre</span>'
+                       : '<span class="km">'+km+' km</span>';
+    return '<article class="spot">'+
+             '<div class="top"><h4>'+name+'</h4>'+far+'</div>'+
+             '<p>'+text+'</p>'+
+             '<a class="dir" href="'+href+'" target="_blank" rel="noopener">'+
+               label+' <span class="sr">for '+name+'</span>'+arrow+'</a>'+
+           '</article>';
+  }).join('');
+
+  document.getElementById('spots-note').textContent =
+    spots.length
+      ? 'Distances are approximate, by road from the centre of ' + town +
+        (meta.alt ? ', which sits at about ' + meta.alt.toLocaleString('en-IN') + ' m' : '') +
+        '. Open any card in Google Maps for the exact route and driving time.'
+      : '';
+
+  /* month strip */
+  var m = r.monthly, mx = Math.max.apply(null, m), mn = Math.min.apply(null, m), sp = Math.max(1,mx-mn);
+  var mh='';
+  for(var i=0;i<12;i++){
+    var frac = (m[i]-mn)/sp, h = Math.round(24 + frac*72);
+    var cls = frac>0.66 ? 'busy' : (frac<0.34 ? 'quiet' : '');
+    if(i===d.getMonth()) cls += ' here';
+    mh += '<div class="mo '+cls+'" title="'+MONTHS[i]+': about '+Math.round(m[i])+' visitors a day">'+
+          '<div class="bar" style="height:'+h+'px"></div><div class="ml">'+MONTHS[i].charAt(0)+'</div></div>';
+  }
+  document.getElementById('months').innerHTML = mh;
+
+  /* quieter days near the chosen date */
+  var found=[], probe;
+  for(var off=1; off<=21 && found.length<6; off++){
+    for(var s=-1; s<=1; s+=2){
+      probe = new Date(d.getTime()); probe.setDate(probe.getDate()+off*s);
+      var pr = lookup(site, probe);
+      if(pr && pr.code==='M' && r.code!=='M'){
+        found.push({d:new Date(probe.getTime())});
+        if(found.length>=6) break;
+      }
+    }
+  }
+  var qd = document.getElementById('quieter-days');
+  if(r.code==='M'){
+    qd.innerHTML = '<span class="chip">Your date is already one of the quiet ones.</span>';
+  } else if(found.length){
+    found.sort(function(a,b){return a.d-b.d;});
+    qd.innerHTML = found.map(function(f){
+      return '<button type="button" class="chip day" data-iso="'+iso(f.d)+'">'+
+             f.d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})+'</button>';
+    }).join('');
+  } else {
+    qd.innerHTML = '<span class="chip">No quieter day within three weeks. This is a busy stretch for '+site+'.</span>';
+  }
+
+  document.getElementById('r-route').href =
+    'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(origin||'New Delhi')+
+    '&destination='+encodeURIComponent(site+', Uttarakhand')+'&travelmode=driving';
+
+  result.hidden = false;
+  requestAnimationFrame(function(){ result.classList.add('on'); });
+}
+
+document.getElementById('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var d = new Date(dateIn.value+'T00:00:00');
+  if(isNaN(d)) return;
+  render(siteSel.value, d, document.getElementById('origin').value.trim());
+});
+
+/* clicking a quieter day re-runs the planner on it */
+document.getElementById('quieter-days').addEventListener('click', function(e){
+  var b = e.target.closest('.chip.day'); if(!b) return;
+  dateIn.value = b.getAttribute('data-iso');
+  render(siteSel.value, new Date(dateIn.value+'T00:00:00'), document.getElementById('origin').value.trim());
+  document.getElementById('r-when').scrollIntoView({block:'center'});
+});
+
+/* ============================================================
+   8. Boot
+   ============================================================ */
+applyHeroMode();
+if(rmq.matches) pinToFinalStates();
+
+})();
+</script>
+</body>
+</html>

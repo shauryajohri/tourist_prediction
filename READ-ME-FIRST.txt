@@ -1,0 +1,90 @@
+SHAANT
+Know the rush before you go.
+================================================================
+
+HOW TO OPEN IT
+--------------
+Double-click  index.html
+
+That is the whole instruction. It opens in your web browser and
+everything works: the scrolling mountain hero, the planner, all
+of it. Nothing to install. No Python. No terminal. It also works
+with no internet connection.
+
+For the quick version, double-click  place.html  instead.
+Type a place (spelling does not matter, "massori" finds Mussoorie)
+and one page shows, in order: how crowded it is, the weather,
+a price bar with hotels in the budget you pick, the places to see
+there, and a map of the drive from where you are.
+The crowd, hotels and places work offline. The live weather, the
+map and the route need an internet connection.
+
+
+HOW TO SHARE IT WITH SOMEONE
+----------------------------
+Send them this whole "shaant" folder, zipped. They double-click
+index.html the same way. Do not send index.html on its own, it
+needs the assets folder next to it.
+
+
+WHAT IS IN THIS FOLDER
+----------------------
+index.html        The full website, with the planner.
+place.html        The quick page: type a place, see everything.
+assets/data.js    Your model's answers, worked out in advance.
+                  29 destinations, 853 dates, from 1 Sep 2026
+                  to 31 Dec 2028.
+assets/places.js  The 29 destinations: places to see, map
+                  coordinates, and the hotel lists. Both pages
+                  read it, so a change here shows on both.
+READ-ME-FIRST.txt This file.
+
+
+ABOUT THE NUMBERS (please read this one)
+----------------------------------------
+The planner runs on your trained model. The model itself is fine.
+The dataset it learned from is sample data, not real visitor counts.
+
+In that dataset every destination behaves almost identically.
+Kedarnath, which is snowed shut for half the year, and Haridwar,
+which is a city on the plains open all year, have nearly the same
+visitor curve. The gap between destinations is about 3 visitors.
+The gap between months is about 52.
+
+So the model reads the SEASON well and cannot read the DESTINATION.
+Weekends show no effect at all in the data.
+
+The site says this out loud in two places, on purpose: a line under
+every result, and a section called "What it cannot do yet".
+
+If you ever get real visitor records, drop them in, retrain with
+train_model.py, and re-export. The website itself does not need to
+change at all.
+
+
+IF YOU WANT SOMETHING CHANGED
+-----------------------------
+Say it in plain words and it gets changed. You do not need to edit
+anything yourself. Examples that are all easy: different colours,
+different wording, more destinations, a different date range, a
+real video behind the hero.
+
+
+IF YOU EVER ADD A HERO VIDEO
+----------------------------
+Put these two files in the assets folder:
+    assets/hero-scrub.mp4
+    assets/hero-poster.jpg
+Then open index.html in a text editor, find the line
+
+    var HAS_VIDEO = false;
+
+and change false to true. That is the only edit. The drawn mountain
+scene stays as the backup for anyone whose video does not load, and
+phones keep the still version either way.
+
+
+PUTTING IT ON THE INTERNET
+--------------------------
+Not set up, and not needed for it to work. If you ever want a real
+web address, the folder is ready to upload to any web host as-is.
