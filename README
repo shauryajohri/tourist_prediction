@@ -2,6 +2,12 @@
 
 An interactive Streamlit app that predicts whether a Uttarakhand tourist destination is likely to be Mild, Suitable, or Overcrowded for a selected future date.
 
+## Website
+
+The `shaant/` folder is a static website built on this model, with nothing to install. Double-click `shaant/index.html`, type a place, and it shows the crowd level for your date, the weather, hotels that fit your budget, the places to see, and the drive from where you are.
+
+It is published with GitHub Pages from the `gh-pages` branch, which holds only the contents of `shaant/`. See `shaant/READ-ME-FIRST.txt` for details.
+
 ## Features
 
 - Google Trends integration

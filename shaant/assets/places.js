@@ -1,5 +1,5 @@
 /* ============================================================
-   SHAANT: the 29 destinations, shared by index.html and place.html.
+   SHAANT: the 29 destinations, read by index.html.
    ll    [lat, lon] of the town or base, where weather is read and the
          route ends. Approximate, to a few hundred metres.
    halt  altitude of that base when it differs from the destination.
