@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shaant. Type a place, see everything.</title>
+<meta name="description" content="Type a place in Uttarakhand. See how crowded it is, the weather, hotels in your budget, what to see there, and how far it is from you.">
+<meta name="theme-color" content="#101826">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101826'/%3E%3Cpath d='M4 22 L11 12 L15 17 L20 8 L28 22 Z' fill='%23f4816a'/%3E%3Cpath d='M4 25 h24' stroke='%237fd4d8' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..700&family=Karla:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ============================================================
+   SHAANT: place finder. Same tokens as index.html.
+   ============================================================ */
+:root{
+  --canvas:#101826;
+  --canvas-deep:#0b111c;
+  --panel:#18222f;
+  --panel-hi:#1f2b3a;
+  --accent:#f4816a;
+  --accent-hover:#ff9b85;
+  --cool:#7fd4d8;
+  --warm:#f2c46d;
+  --text-primary:#eaf0f7;
+  --text-secondary:#93a4ba;
+  --text-dim:#6f8098;
+  --line:#2a3646;
+  --line-strong:#3d4d61;
+
+  /* stay cards are tinted by the kind of stay, never by price */
+  --t-a:#7fd4d8;   /* hotels and resorts */
+  --t-b:#f2c46d;   /* heritage and boutique */
+  --t-c:#9fd8a6;   /* homestays, guesthouses, hostels */
+  --t-d:#b9b0f0;   /* rest houses, ashrams, camps */
+
+  --display:'Archivo',system-ui,sans-serif;
+  --body:'Karla',system-ui,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --maxw:1080px;
+}
+
+*{box-sizing:border-box}
+html,body{overflow-x:hidden;overflow-x:clip}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--canvas);color:var(--text-primary);
+  font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--display);font-variation-settings:'wdth' 116;line-height:1.08;margin:0;letter-spacing:-.015em}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+svg{max-width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-9999px;top:0;z-index:200;background:var(--accent);color:#1a0d0a;
+  padding:12px 20px;border-radius:0 0 10px 0;font-weight:600}
+.skip:focus{left:0}
+
+/* ---------- top bar ---------- */
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:18px;padding-bottom:10px}
+.brand{display:flex;align-items:baseline;gap:10px;font-family:var(--display);
+  font-variation-settings:'wdth' 122;font-weight:700;font-size:19px;letter-spacing:.01em;text-decoration:none}
+.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;flex:none;translate:0 -2px}
+.brand span{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text-secondary);
+  letter-spacing:.14em;text-transform:uppercase}
+.top a.back{font-size:14.5px;color:var(--text-secondary);text-decoration:none;transition:color .3s var(--ease)}
+.top a.back:hover{color:var(--text-primary)}
+
+/* ---------- hero and search ---------- */
+.hero{position:relative;padding:9vh 0 8vh;text-align:center;transition:padding .6s var(--ease)}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 70% at 50% 0%,rgba(244,129,106,.10),transparent 70%),
+             radial-gradient(40% 50% at 85% 60%,rgba(127,212,216,.07),transparent 70%)}
+.hero>*{position:relative}
+.hero h1{font-size:clamp(34px,6.2vw,64px);font-variation-settings:'wdth' 120;font-weight:700;transition:font-size .6s var(--ease)}
+.hero .lede{margin:16px auto 0;max-width:50ch;color:var(--text-secondary);font-size:clamp(16px,2vw,19px)}
+.ridge{position:absolute;left:0;right:0;bottom:0;width:100%;height:70px;pointer-events:none}
+.ridge path{fill:none;stroke:var(--line);stroke-width:1.2}
+.ridge path:nth-child(2){stroke:rgba(244,129,106,.28)}
+
+.hero.compact{padding:2vh 0 4vh}
+.hero.compact h1{font-size:clamp(24px,3.4vw,32px)}
+.hero.compact .lede,.hero.compact .popular{display:none}
+
+.search{position:relative;display:grid;grid-template-columns:1fr 200px auto;gap:10px;max-width:780px;
+  margin:30px auto 0;padding:10px;text-align:left;background:var(--panel);
+  border:1px solid var(--line-strong);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.hero.compact .search{margin-top:16px}
+.field{position:relative;display:flex;flex-direction:column;justify-content:center;
+  background:var(--canvas-deep);border:1px solid var(--line);border-radius:14px;padding:8px 14px 9px;
+  transition:border-color .3s var(--ease)}
+.field:focus-within{border-color:var(--cool)}
+.field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary)}
+.field input{width:100%;min-width:0;background:none;border:0;outline:0;padding:3px 0 0;
+  color:var(--text-primary);font:500 19px/1.3 var(--body);color-scheme:dark}
+.field input::placeholder{color:#5d6d82}
+.go{min-height:58px;padding:0 26px;border:0;border-radius:14px;cursor:pointer;white-space:nowrap;
+  background:var(--accent);color:#1a0d0a;font-weight:600;font-size:17px;
+  transition:background .3s var(--ease),transform .3s var(--ease)}
+.go:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.search>*{min-width:0}
+@media (max-width:640px){
+  .search{grid-template-columns:minmax(0,1fr) auto}
+  .search .field.q{grid-column:1/-1}
+  .go{padding:0 20px}
+}
+
+.suggest{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:30;list-style:none;margin:0;padding:6px;
+  background:var(--panel-hi);border:1px solid var(--line-strong);border-radius:14px;
+  box-shadow:0 18px 50px rgba(0,0,0,.5);max-height:330px;overflow:auto}
+.suggest li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:11px 12px;border-radius:10px;cursor:pointer}
+.suggest li[aria-selected="true"],.suggest li:hover{background:rgba(127,212,216,.1)}
+.suggest .nm{font-weight:600}
+.suggest .kd{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--text-secondary);white-space:nowrap}
+
+.popular{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:18px}
+.popular>span{font-size:14px;color:var(--text-secondary);margin-right:4px}
+.chip{background:rgba(255,255,255,.045);border:1px solid var(--line-strong);border-radius:999px;
+  padding:7px 14px;font-size:14.5px;cursor:pointer;
+  transition:border-color .3s var(--ease),color .3s var(--ease),background .3s var(--ease)}
+.chip:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.08)}
+@media (pointer:coarse){.chip{min-height:44px}}
+.msg{max-width:780px;margin:16px auto 0;font-size:15.5px;color:var(--text-secondary)}
+.msg:empty{display:none}
+.msg b{color:var(--text-primary)}
+.msg .all{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+
+/* ---------- result head ---------- */
+.out{padding-bottom:30px}
+.head{padding:26px 0 24px;border-bottom:1px solid var(--line);margin-bottom:26px;scroll-margin-top:12px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool)}
+.head h2{font-size:clamp(42px,7vw,76px);font-variation-settings:'wdth' 122;font-weight:700;margin-top:10px}
+.head .when{margin-top:8px;color:var(--text-secondary);font-size:17px}
+
+/* ---------- at a glance ---------- */
+.glance{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:920px){.glance{grid-template-columns:1fr 1fr}.glance .far{grid-column:1/-1}}
+@media (max-width:600px){.glance{grid-template-columns:1fr}}
+.g{position:relative;display:flex;flex-direction:column;gap:8px;min-height:250px;overflow:hidden;
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 22px 20px}
+.g::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--tone,var(--line-strong))}
+.g .lab{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-secondary)}
+.g .big{font-family:var(--display);font-variation-settings:'wdth' 118;font-weight:700;
+  font-size:clamp(32px,3.8vw,42px);line-height:1.05;color:var(--tone,var(--text-primary))}
+.g .big .lo{font-size:.62em;font-weight:500;color:var(--text-secondary)}
+.g .say{font-size:16px;line-height:1.5;color:#c6d0dd}
+.g .small{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
+.g .foot{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.g .src{font-size:12.5px;color:var(--text-dim);line-height:1.45}
+
+.crowd.quiet{--tone:var(--cool)}
+.crowd.steady{--tone:var(--warm)}
+.crowd.busy{--tone:var(--accent)}
+.people{display:flex;gap:2px;margin-top:2px}
+.people svg{width:30px;height:30px;color:var(--line-strong)}
+.people svg.on{color:var(--tone)}
+
+.weather{--tone:#b9c7d8}
+.wrow{display:flex;align-items:center;gap:14px}
+.wrow>svg{width:52px;height:52px;flex:none;color:var(--tone)}
+.far{--tone:var(--cool)}
+
+.btn-line{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:transparent;
+  border-radius:999px;padding:9px 16px;font-size:14.5px;cursor:pointer;text-decoration:none;
+  transition:border-color .3s var(--ease),color .3s var(--ease),background .3s var(--ease)}
+.btn-line:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.07)}
+.btn-line svg{width:16px;height:16px}
+@media (pointer:coarse){.btn-line{min-height:44px}}
+.skel{display:inline-block;height:.9em;width:7ch;border-radius:6px;vertical-align:middle;
+  background:linear-gradient(90deg,var(--line) 0,var(--line-strong) 50%,var(--line) 100%);
+  background-size:200% 100%;animation:shimmer 1.3s linear infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+.fine{font-size:13.5px;color:var(--text-dim);margin-top:14px;line-height:1.5}
+
+/* ---------- sections ---------- */
+.block{margin-top:70px;scroll-margin-top:20px}
+.step{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool);margin-bottom:10px}
+.block h3{font-size:clamp(26px,3.4vw,36px);font-variation-settings:'wdth' 116}
+.block .sub{margin-top:8px;color:var(--text-secondary);font-size:16.5px;max-width:60ch}
+.note{font-size:13.5px;color:var(--text-secondary);margin-top:16px;line-height:1.5;max-width:80ch}
+
+/* ---------- budget bar: drag it, or type the number ---------- */
+.budget{margin-top:22px;padding:22px 24px 16px;background:var(--canvas-deep);
+  border:1px solid var(--line-strong);border-radius:18px}
+.b-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
+.b-top label{font-size:16px;color:#c6d0dd}
+.b-input{display:flex;align-items:baseline;gap:6px;padding:6px 14px 7px;background:var(--panel);
+  border:1px solid var(--line-strong);border-radius:12px;transition:border-color .3s var(--ease)}
+.b-input:focus-within{border-color:var(--cool)}
+.b-input span{font-family:var(--display);font-weight:600;font-size:24px;color:var(--text-secondary)}
+.b-input input{width:7ch;min-width:0;background:none;border:0;outline:0;padding:0;color:var(--text-primary);
+  font:700 26px/1.2 var(--display);font-variation-settings:'wdth' 112}
+.b-input small{font-size:14px;color:var(--text-secondary);white-space:nowrap}
+.b-fit{margin-left:auto;font-size:15px;color:var(--text-secondary)}
+.b-fit b{color:var(--cool);font-weight:600}
+@media (max-width:600px){.b-fit{margin-left:0;flex-basis:100%}}
+/* the thumb is 24 px wide, so marks and labels sit on the 12 px-inset track it actually travels */
+.b-slider{position:relative;height:40px;margin-top:20px}
+.b-marks{position:absolute;left:0;right:0;top:0;height:12px;pointer-events:none}
+.b-marks i{position:absolute;top:0;width:3px;height:12px;margin-left:-1.5px;border-radius:2px;
+  left:calc(12px + (100% - 24px)*var(--p));background:var(--line-strong);transition:background .3s var(--ease)}
+.b-marks i.in{background:var(--cool)}
+.b-range{-webkit-appearance:none;appearance:none;position:absolute;left:0;right:0;bottom:0;width:100%;height:24px;
+  margin:0;background:transparent;cursor:pointer;touch-action:pan-y}
+.b-range::-webkit-slider-runnable-track{height:8px;border-radius:999px;
+  background:linear-gradient(to right,var(--cool) 0 var(--fill,50%),var(--line-strong) var(--fill,50%) 100%)}
+.b-range::-moz-range-track{height:8px;border-radius:999px;background:var(--line-strong)}
+.b-range::-moz-range-progress{height:8px;border-radius:999px;background:var(--cool)}
+.b-range::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-8px;border-radius:50%;
+  background:#fff;border:4px solid var(--cool);box-shadow:0 0 0 6px rgba(127,212,216,.18);transition:box-shadow .2s}
+.b-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--cool);
+  box-shadow:0 0 0 6px rgba(127,212,216,.18)}
+.b-range:focus-visible{outline:none}
+.b-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 9px rgba(127,212,216,.4)}
+.b-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 9px rgba(127,212,216,.4)}
+.b-scale{position:relative;height:18px;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim)}
+.b-scale span{position:absolute;top:0;left:calc(12px + (100% - 24px)*var(--p));transform:translateX(-50%);white-space:nowrap}
+.b-scale span:first-child{transform:translateX(-12px)}
+.b-scale span:last-child{transform:translateX(calc(-100% + 12px))}
+
+/* ---------- carousel: three across, arrows either side, swipe on touch ---------- */
+.carousel{margin-top:20px}
+.car-view{position:relative}
+.track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 32px)/3);gap:16px;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-behavior:smooth;
+  scrollbar-width:none;padding:6px 0 10px}
+.track::-webkit-scrollbar{display:none}
+.track>.slot{display:flex;scroll-snap-align:start}
+.track>.slot>*{flex:1;min-width:0}
+.track:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:18px}
+@media (max-width:900px){.track{grid-auto-columns:calc((100% - 16px)/2)}}
+@media (max-width:600px){.track{grid-auto-columns:84%}}
+.car-btn{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:46px;height:46px;margin-top:-23px;
+  border-radius:50%;cursor:pointer;background:var(--panel-hi);color:var(--text-primary);
+  border:1px solid var(--line-strong);box-shadow:0 8px 24px rgba(0,0,0,.45);
+  transition:background .3s var(--ease),color .3s var(--ease),transform .2s var(--ease)}
+.car-btn:hover{background:var(--line-strong);color:var(--cool)}
+.car-btn:active{transform:scale(.92)}
+.car-btn svg{width:20px;height:20px}
+/* arrows never sit on a card: out in the page margin when there is one, beside a narrowed
+   row when there is not, and under the row on a phone */
+.car-btn.prev{left:-66px}
+.car-btn.next{right:-66px}
+.car-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;min-height:18px}
+@media (max-width:1219px){
+  .car-view{padding:0 34px}
+  .car-btn.prev{left:-14px}
+  .car-btn.next{right:-14px}
+  .car-foot{padding:0 34px}
+}
+@media (max-width:600px){
+  .car-view{padding:0}
+  .car-btn{top:auto;bottom:-58px;margin-top:0;width:44px;height:44px}
+  .car-btn.prev{left:0}
+  .car-btn.next{right:0}
+  .car-foot{justify-content:center;gap:14px;min-height:44px;margin-top:14px;padding:0 56px}
+  .carousel.static .car-foot{margin-top:6px;min-height:0}
+}
+.car-count{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--text-secondary)}
+.car-dots{display:flex;gap:6px}
+.car-dots span{width:7px;height:7px;border-radius:50%;background:var(--line-strong);transition:background .3s var(--ease)}
+.car-dots span.on{background:var(--cool)}
+.carousel.static .car-btn,.carousel.static .car-dots{display:none}
+/* the rotation: cards ease in at one edge and out at the other as the row moves */
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion:no-preference){
+    .track>.slot>*{animation:car-edge linear both;animation-timeline:view(inline)}
+  }
+}
+@keyframes car-edge{
+  0%{opacity:.25;transform:scale(.9)}
+  20%,80%{opacity:1;transform:none}
+  100%{opacity:.25;transform:scale(.9)}
+}
+
+/* ---------- stay cards ---------- */
+.stay{display:flex;flex-direction:column;overflow:hidden;background:var(--panel);
+  border:1px solid var(--line);border-radius:18px;
+  transition:translate .4s var(--ease),border-color .4s var(--ease)}
+/* translate, not transform: the carousel animates transform on these cards */
+.stay:hover{translate:0 -3px;border-color:var(--line-strong)}
+.stay[data-g="a"]{--tc:var(--t-a)}
+.stay[data-g="b"]{--tc:var(--t-b)}
+.stay[data-g="c"]{--tc:var(--t-c)}
+.stay[data-g="d"]{--tc:var(--t-d)}
+.stay .art{position:relative;height:96px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 18px;overflow:hidden;border-bottom:1px solid var(--line);
+  background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.01));
+  background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 24%,transparent),color-mix(in srgb,var(--tc) 3%,transparent))}
+/* the contour motif from index.html, carried onto every card */
+.stay .art::after{content:"";position:absolute;right:-20px;bottom:-16px;width:180px;height:90px;pointer-events:none;opacity:.55;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='90'%3E%3Cg fill='none' stroke='%23eaf0f7' stroke-opacity='.18' stroke-width='1'%3E%3Cpath d='M0 40 C40 24 76 52 112 40 142 30 164 44 180 36'/%3E%3Cpath d='M0 58 C42 42 78 70 114 58 144 48 166 62 180 54'/%3E%3Cpath d='M0 76 C44 60 80 88 116 76 146 66 168 80 180 72'/%3E%3C/g%3E%3C/svg%3E")}
+.stay .art>*{position:relative;z-index:1}
+.stay .art .ic{width:42px;height:42px;color:var(--tc)}
+.stay .ty{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-align:right;line-height:1.5}
+.stay .ty em{display:block;font-style:normal;letter-spacing:.04em;text-transform:none;color:var(--text-secondary);font-family:var(--body);font-size:12.5px}
+.stay .body{display:flex;flex-direction:column;gap:7px;flex:1;padding:16px 18px 16px}
+.stay h4{font-size:18px;font-variation-settings:'wdth' 110;line-height:1.25}
+.stay .price{font-family:var(--display);font-weight:600;font-size:17px;color:var(--tc)}
+.stay .price small{font-family:var(--body);font-weight:400;font-size:13.5px;color:var(--text-secondary)}
+.stay .d{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
+.links{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:auto;padding-top:8px}
+.lnk{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--text-secondary);text-decoration:none;transition:color .3s var(--ease)}
+.lnk:hover{color:var(--accent)}
+.lnk svg{width:11px;height:11px;transition:transform .3s var(--ease)}
+.lnk:hover svg{transform:translate(2px,-2px)}
+@media (pointer:coarse){.lnk{min-height:44px}}
+.empty{margin-top:20px;padding:22px;border:1px dashed var(--line-strong);border-radius:16px;color:var(--text-secondary)}
+.empty[hidden]{display:none}
+.empty .chip{margin-top:12px}
+
+/* ---------- places to see ---------- */
+.spot{display:flex;flex-direction:column;gap:8px;background:var(--canvas-deep);border:1px solid var(--line);
+  border-radius:16px;padding:18px 18px 12px;
+  transition:border-color .4s var(--ease),translate .4s var(--ease),background .4s var(--ease)}
+.spot:hover{border-color:var(--line-strong);translate:0 -3px;background:var(--panel)}
+.spot .row{display:flex;align-items:center;gap:12px}
+.spot .ic{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;color:var(--cool);
+  background:rgba(127,212,216,.08);border:1px solid rgba(127,212,216,.2)}
+.spot .ic svg{width:22px;height:22px}
+.spot h4{font-size:16.5px;line-height:1.25;font-variation-settings:'wdth' 110}
+.spot .km{display:block;margin-top:3px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--cool)}
+.spot .km.here{color:var(--text-secondary)}
+.spot p{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
+.spot .links{padding-top:4px}
+
+/* ---------- route ---------- */
+.route-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 22px;
+  border:0;border-radius:999px;cursor:pointer;background:var(--accent);color:#1a0d0a;font-weight:600;font-size:16px;
+  text-decoration:none;transition:background .3s var(--ease),transform .3s var(--ease)}
+.btn:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.btn svg{width:18px;height:18px}
+.btn.ghost{background:transparent;color:var(--text-primary);border:1px solid var(--line-strong)}
+.btn.ghost:hover{background:rgba(255,255,255,.05);border-color:var(--text-secondary)}
+.or{font-size:14px;color:var(--text-secondary)}
+.from{display:flex;flex:1;min-width:250px;max-width:440px;padding:4px 4px 4px 18px;
+  background:var(--canvas-deep);border:1px solid var(--line-strong);border-radius:999px;transition:border-color .3s var(--ease)}
+.from:focus-within{border-color:var(--cool)}
+.from input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text-primary);font:16px var(--body)}
+.from input::placeholder{color:#5d6d82}
+.from button{border:0;border-radius:999px;padding:0 18px;min-height:40px;cursor:pointer;background:var(--panel-hi);font-weight:600;
+  transition:background .3s var(--ease)}
+.from button:hover{background:var(--line-strong)}
+.rsum{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;margin-top:22px;min-height:20px}
+.rsum .km{font-family:var(--display);font-variation-settings:'wdth' 120;font-weight:700;font-size:clamp(38px,5vw,56px);line-height:1}
+.rsum .tm{font-size:19px;color:#c6d0dd}
+.rsum .from-txt{flex-basis:100%;font-size:15px;color:var(--text-secondary)}
+.rsum .status{font-size:15.5px;color:var(--text-secondary)}
+.linkish{background:none;border:0;padding:0;color:var(--cool);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.go-note{margin-top:14px;display:flex;gap:10px;align-items:flex-start;font-size:15px;color:#c6d0dd;
+  background:rgba(127,212,216,.055);border:1px solid rgba(127,212,216,.2);border-radius:12px;padding:13px 15px}
+.go-note svg{flex:none;width:18px;height:18px;margin-top:2px;color:var(--cool)}
+.go-note[hidden]{display:none}
+.map{position:relative;height:min(62vh,470px);margin-top:18px;overflow:hidden;
+  background:var(--canvas-deep);border:1px solid var(--line-strong);border-radius:18px}
+.map-off{display:grid;place-items:center;height:100%;padding:24px;text-align:center;color:var(--text-secondary)}
+.route-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px}
+.route-foot .note{margin-top:0;flex:1;min-width:240px}
+
+/* Leaflet, dressed for the dark canvas. Scoped to #map because leaflet.css is loaded
+   later, on demand, and would win a tie on specificity. */
+#map.leaflet-container{background:var(--canvas-deep);font-family:var(--body)}
+#map .leaflet-bar{border:1px solid var(--line-strong)}
+#map .leaflet-bar a{background:var(--panel-hi);color:var(--text-primary);border-bottom-color:var(--line-strong)}
+#map .leaflet-bar a:hover,#map .leaflet-bar a:focus{background:var(--line-strong);color:var(--text-primary)}
+#map .leaflet-control-attribution{background:rgba(11,17,28,.82);color:var(--text-secondary);font-size:10.5px;line-height:1.5;padding:1px 7px}
+#map .leaflet-control-attribution a{color:#b9c7d8}
+.pin i{display:block;width:20px;height:20px;border-radius:50%;border:3px solid #fff;
+  background:var(--accent);box-shadow:0 0 0 7px rgba(244,129,106,.28)}
+.pin.you i{background:var(--cool);box-shadow:0 0 0 7px rgba(127,212,216,.28)}
+.pin b{position:absolute;left:28px;top:-1px;white-space:nowrap;padding:4px 9px;border-radius:8px;
+  font:600 13px/1.2 var(--body);color:#fff;background:rgba(11,17,28,.88);border:1px solid var(--line-strong)}
+
+/* ---------- footer ---------- */
+footer{margin-top:70px;border-top:1px solid var(--line);background:var(--canvas-deep);padding:40px 0 50px}
+footer p{font-size:14.5px;color:var(--text-secondary);max-width:80ch;line-height:1.6}
+footer p+p{margin-top:8px}
+footer .fine{margin-top:8px}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#q">Skip to the search</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="place.html"><i aria-hidden="true"></i>Shaant<span>Uttarakhand</span></a>
+    <a class="back" href="index.html">Full planner</a>
+  </div>
+</header>
+
+<section class="hero" id="hero">
+  <div class="wrap">
+    <h1>Where do you want to go?</h1>
+    <p class="lede">Type a place in Uttarakhand. You get how crowded it is, the weather, hotels in your budget, what to see, and how far it is from you.</p>
+
+    <form class="search" id="search" role="search" autocomplete="off" novalidate>
+      <div class="field q">
+        <label for="q">Place</label>
+        <input id="q" type="text" placeholder="Try Mussoorie" spellcheck="false"
+               role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+        <ul class="suggest" id="suggest" role="listbox" aria-label="Places" hidden></ul>
+      </div>
+      <div class="field">
+        <label for="d">When</label>
+        <input id="d" type="date">
+      </div>
+      <button class="go" type="submit">Show me</button>
+    </form>
+
+    <div class="popular" id="popular"><span>Popular:</span></div>
+    <div class="msg" id="msg" aria-live="polite"></div>
+  </div>
+  <svg class="ridge" viewBox="0 0 1400 70" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 52 C230 34 420 70 640 52 860 34 1080 66 1400 48"/>
+    <path d="M0 64 C240 46 430 82 650 64 870 46 1090 80 1400 60"/>
+  </svg>
+</section>
+
+<main class="out wrap" id="out" hidden>
+
+  <div class="head" id="head">
+    <p class="eyebrow" id="p-kind"></p>
+    <h2 id="p-name"></h2>
+    <p class="when" id="p-when"></p>
+  </div>
+
+  <!-- 1. at a glance -->
+  <section aria-label="At a glance">
+    <div class="glance">
+      <article class="g crowd" id="crowd"></article>
+      <article class="g weather" id="weather"></article>
+      <article class="g far" id="far"></article>
+    </div>
+    <p class="fine">Crowd levels come from a model trained on sample data, so read them as a guide to the season, not a headcount.</p>
+  </section>
+
+  <!-- 2. where to stay -->
+  <section class="block" id="stay" aria-labelledby="stay-h">
+    <p class="step">Where to stay</p>
+    <h3 id="stay-h">What is your budget for one night?</h3>
+    <div class="budget">
+      <div class="b-top">
+        <label for="b-in">Drag the bar, or type an amount</label>
+        <div class="b-input"><span aria-hidden="true">₹</span>
+          <input id="b-in" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-describedby="b-fit">
+          <small>a night</small></div>
+        <p class="b-fit" id="b-fit" aria-live="polite"></p>
+      </div>
+      <div class="b-slider">
+        <div class="b-marks" id="b-marks" aria-hidden="true"></div>
+        <input class="b-range" id="b-range" type="range" min="0" max="1000" step="1" aria-label="Budget for one night">
+      </div>
+      <div class="b-scale" id="b-scale" aria-hidden="true"></div>
+    </div>
+    <div class="carousel" id="stay-car">
+      <div class="car-view">
+        <button type="button" class="car-btn prev" aria-label="Previous stays"></button>
+        <div class="track" id="stays" tabindex="0" role="group" aria-label="Stays that fit your budget"></div>
+        <button type="button" class="car-btn next" aria-label="More stays"></button>
+      </div>
+      <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
+    </div>
+    <div class="empty" id="stays-empty" hidden></div>
+    <p class="note">Each tick on the bar is a stay here. Only well-known stays are named. Prices are rough and change a lot with the season and at weekends, so tap Check price for today's rate.</p>
+  </section>
+
+  <!-- 3. places to see -->
+  <section class="block" id="see" aria-labelledby="see-h">
+    <p class="step">Places to see</p>
+    <h3 id="see-h"></h3>
+    <div class="carousel" id="spot-car">
+      <div class="car-view">
+        <button type="button" class="car-btn prev" aria-label="Previous places"></button>
+        <div class="track" id="spots" tabindex="0" role="group" aria-label="Places to see"></div>
+        <button type="button" class="car-btn next" aria-label="More places"></button>
+      </div>
+      <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
+    </div>
+    <p class="note" id="spots-note"></p>
+  </section>
+
+  <!-- 4. how far -->
+  <section class="block" id="route" aria-labelledby="route-h">
+    <p class="step">Getting there</p>
+    <h3 id="route-h"></h3>
+    <div class="route-ctl">
+      <button class="btn" type="button" id="locate"></button>
+      <span class="or">or</span>
+      <form class="from" id="from-form" autocomplete="off">
+        <label class="sr" for="from">Your city</label>
+        <input id="from" type="text" placeholder="Type your city, like Delhi" spellcheck="false">
+        <button type="submit">Go</button>
+      </form>
+    </div>
+    <div class="rsum" id="rsum" aria-live="polite"></div>
+    <p class="go-note" id="go-note" hidden></p>
+    <div class="map" id="map"></div>
+    <div class="route-foot">
+      <p class="note" id="route-note">Drive times are estimates that allow for hill roads. Google Maps has live traffic.</p>
+      <a class="btn ghost" id="gmaps" href="#" target="_blank" rel="noopener">Open in Google Maps</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Shaant, for Uttarakhand. Looking for crowd patterns across the whole year? <a href="index.html">Open the full planner</a>.</p>
+    <p class="fine">Weather from Open-Meteo. Map tiles &copy; Esri, map data &copy; OpenStreetMap contributors. Routes from the OSRM route service. Hotel names and prices are rough guides, not quotes.</p>
+    <p class="fine">Your starting point is sent only to the route service to draw the line, and remembered in this browser so you do not have to type it again.</p>
+  </div>
+</footer>
+
+<script src="assets/places.js"></script>
+<script src="assets/data.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   0. Data and small helpers
+   ============================================================ */
+var P = window.PRED, PLACES = window.PLACES, STAYS = window.STAYS;
+var START = new Date(P.start+'T00:00:00');
+var END = new Date(START.getFullYear(), START.getMonth(), START.getDate()+P.days-1);
+var NAMES = Object.keys(P.sites).filter(function(n){ return PLACES[n]; }).sort();
+var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+var POPULAR = ["Mussoorie","Nainital","Rishikesh","Auli","Jim Corbett National Park","Kedarnath"];
+var LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
+
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function iso(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function midnight(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+function daysBetween(a, b){ return Math.round((midnight(b) - midnight(a))/86400000); }
+function longDate(d){ return d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); }
+function shortDate(d){ return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}); }
+function rupees(n){ return '₹'+n.toLocaleString('en-IN'); }
+function slug(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+function load(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+function fetchJSON(url, ms){
+  var ctrl = 'AbortController' in window ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, ms || 9000) : 0;
+  return fetch(url, ctrl ? {signal:ctrl.signal} : {}).then(function(r){
+    clearTimeout(timer);
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.json();
+  }, function(e){ clearTimeout(timer); throw e; });
+}
+
+/* The one icon set: 24 px line drawings, stroked in the current colour. */
+var ICONS = {
+  hotel:'<path d="M4 21V5.5L12 3l8 2.5V21"/><path d="M2.5 21h19"/><path d="M9.5 21v-4h5v4"/><path d="M8 8.5h1.5M11.25 8.5h1.5M14.5 8.5H16M8 12.5h1.5M11.25 12.5h1.5M14.5 12.5H16"/>',
+  heritage:'<path d="M3 9 12 4l9 5"/><path d="M4.5 9.5h15"/><path d="M6.5 10v7.5M10 10v7.5M14 10v7.5M17.5 10v7.5"/><path d="M4 18h16M2.5 21h19"/>',
+  resort:'<path d="M2.5 21h19"/><path d="M4 21v-8.5l5.5-4.5 5.5 4.5V21"/><path d="M8 21v-4h3v4"/><path d="M18.5 21v-5"/><path d="M18.5 16c-1.9 0-3-1.2-3-3 0-2 1.3-4 3-5.5 1.7 1.5 3 3.5 3 5.5 0 1.8-1.1 3-3 3z"/>',
+  home:'<path d="M3.5 11.5 12 4.5l8.5 7"/><path d="M5.5 10v10.5h13V10"/><path d="M10 20.5V15h4v5.5"/>',
+  hostel:'<path d="M4 3.5v17M20 3.5v17"/><path d="M4 10h16M4 17.5h16"/><path d="M7 10V8.3c0-.8.5-1.3 1.3-1.3h2.4c.8 0 1.3.5 1.3 1.3V10M7 17.5v-1.7c0-.8.5-1.3 1.3-1.3h2.4c.8 0 1.3.5 1.3 1.3v1.7"/>',
+  lodge:'<path d="M4 21V11l8-5 8 5v10"/><path d="M2.5 21h19"/><path d="M10 21v-5h4v5"/><path d="M12 6V2.5"/><path d="M12 2.7h4l-1.2 1.2L16 5.1h-4"/>',
+  camp:'<path d="M3 20 12 5l9 15z"/><path d="M12 12.5 9.2 20M12 12.5l2.8 7.5"/><path d="M12 5 10.5 2.5M12 5l1.5-2.5"/>',
+  temple:'<path d="M12 2.5v2"/><path d="M8 11c0-3 1.9-5.3 4-6.5 2.1 1.2 4 3.5 4 6.5"/><path d="M5.5 11h13"/><path d="M7 11v9.5M17 11v9.5"/><path d="M10.3 20.5v-4a1.7 1.7 0 0 1 3.4 0v4"/><path d="M3.5 20.5h17"/>',
+  lake:'<path d="M3 16c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1"/><path d="M3 20c1.5 0 1.5 1 3 1s1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1"/><path d="M4.5 12.5 9 6.5l3 4 2-2.5 5 4.5"/>',
+  fall:'<path d="M4 3.5h16"/><path d="M8 3.5V14M12 3.5v13M16 3.5V14"/><path d="M4.5 19.5c2.3-1.6 4.4 1.6 7.5 0s5.2 1.6 7.5 0"/>',
+  peak:'<path d="M2.5 20 9 8.5l4 6 3-4 5.5 9.5z"/><path d="M7 12l2-3.5 1.8 2.7"/>',
+  tree:'<path d="M12 21v-4"/><path d="M12 3 6.5 11.5h3L6 17h12l-3.5-5.5h3z"/>',
+  town:'<path d="M2.5 21h19"/><path d="M4.5 21V11l4.5-3.5 4.5 3.5v10"/><path d="M13.5 21v-7.5l3-2.5 3 2.5V21"/><path d="M7.5 14h3M7.5 17.5h3"/>',
+  river:'<path d="M3 8c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/><path d="M3 13c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/><path d="M3 18c3 0 3 2 6 2s3-2 6-2 3 2 6 2"/>',
+  cave:'<path d="M2.5 20.5c0-8 4.3-14 9.5-14s9.5 6 9.5 14z"/><path d="M8.5 20.5c0-3.3 1.6-6 3.5-6s3.5 2.7 3.5 6"/>',
+  pin:'<path d="M12 21s-6.5-5.8-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 15.2 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/>',
+  person:'<circle cx="12" cy="7" r="3.3"/><path d="M5.5 20.5c.7-4.2 3.3-6.8 6.5-6.8s5.8 2.6 6.5 6.8"/>',
+  arrow:'<path d="M7 17 17 7M17 7H9.5M17 7v7.5"/>',
+  left:'<path d="M14.5 5.5 8 12l6.5 6.5"/>',
+  right:'<path d="M9.5 5.5 16 12l-6.5 6.5"/>',
+  locate:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 7.6v5.6M12 16.3v.4"/>',
+  /* weather */
+  sun:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/>',
+  part:'<path d="M5.2 11.2A4 4 0 0 1 12.3 6.6"/><path d="M9 2.5V4M3.3 5.3l1 1M14.7 5.3l-1 1M2.5 10.8H4"/><path d="M8.5 20h11a3.2 3.2 0 0 0 .3-6.38 5 5 0 0 0-9.7.52A2.9 2.9 0 0 0 8.5 20z"/>',
+  cloud:'<path d="M6.5 18h11a3.5 3.5 0 0 0 .4-6.97 5.5 5.5 0 0 0-10.7.57A3.2 3.2 0 0 0 6.5 18z"/>',
+  fog:'<path d="M6.5 13h11a3.5 3.5 0 0 0 .4-6.97 5.5 5.5 0 0 0-10.7.57A3.2 3.2 0 0 0 6.5 13z"/><path d="M4 16.5h16M6.5 20h11"/>',
+  rain:'<path d="M6.5 15h11a3.5 3.5 0 0 0 .4-6.97 5.5 5.5 0 0 0-10.7.57A3.2 3.2 0 0 0 6.5 15z"/><path d="M8.5 18l-1 2.5M12.5 18l-1 2.5M16.5 18l-1 2.5"/>',
+  storm:'<path d="M6.5 14h11a3.5 3.5 0 0 0 .4-6.97 5.5 5.5 0 0 0-10.7.57A3.2 3.2 0 0 0 6.5 14z"/><path d="M12.8 14.5 10.6 18h3l-2 3.5"/>',
+  snow:'<path d="M6.5 14h11a3.5 3.5 0 0 0 .4-6.97 5.5 5.5 0 0 0-10.7.57A3.2 3.2 0 0 0 6.5 14z"/><path d="M8 17.3v3.4M6.5 18.2l3 1.6M9.5 18.2l-3 1.6M16 17.3v3.4M14.5 18.2l3 1.6M17.5 18.2l-3 1.6"/>'
+};
+function icon(name, cls){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" '+
+         'stroke-linejoin="round" aria-hidden="true"'+(cls?' class="'+cls+'"':'')+'>'+ICONS[name]+'</svg>';
+}
+
+/* ============================================================
+   1. Search that forgives spelling
+   "massori", "masoori" and "mussoorie" all land on Mussoorie.
+   ============================================================ */
+var ALIAS = {
+  "Dehradun":["doon","dehra dun"], "Haridwar":["hardwar"], "Kedarnath":["kedar"],
+  "Jim Corbett National Park":["corbett","jim corbett"], "Valley of Flowers":["vof","phoolon ki ghati"],
+  "Nainital":["naini tal"], "Rishikesh":["hrishikesh"], "Mussoorie":["queen of the hills"]
+};
+
+/* NFD splits accented letters into letter + mark; the a-z filter then drops the mark */
+function norm(s){
+  return s.toLowerCase().normalize('NFD').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();
+}
+/* a sound key: keep the first letter, fold look-alike spellings, drop vowels and h,
+   squash doubled letters. massori -> msr, mussoorie -> msr. */
+function sound(s){
+  s = s.replace(/ /g,'').replace(/ph/g,'f').replace(/w/g,'v').replace(/q/g,'k')
+       .replace(/c(?!h)/g,'k').replace(/z/g,'j').replace(/x/g,'ks');
+  if(!s) return '';
+  return (s.charAt(0) + s.slice(1).replace(/[aeiouyh]/g,'')).replace(/(.)\1+/g,'$1');
+}
+function lev(a, b){
+  var m = a.length, n = b.length, prev = [], cur, i, j;
+  for(j=0;j<=n;j++) prev[j] = j;
+  for(i=1;i<=m;i++){
+    cur = [i];
+    for(j=1;j<=n;j++){
+      cur[j] = Math.min(prev[j]+1, cur[j-1]+1, prev[j-1] + (a.charCodeAt(i-1)===b.charCodeAt(j-1) ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[n];
+}
+function likeness(a, b){ return (a && b) ? 1 - lev(a,b)/Math.max(a.length,b.length) : 0; }
+
+var INDEX = [];
+function addToIndex(label, site, kind){
+  var n = norm(label);
+  INDEX.push({label:label, site:site, kind:kind, n:n, s:sound(n),
+    words:n.split(' ').filter(function(w){ return w.length>1; }).map(function(w){ return {n:w, s:sound(w)}; })});
+}
+var PLACE_KEYS = NAMES.map(norm);
+NAMES.forEach(function(site){
+  addToIndex(site, site, 'place');
+  (ALIAS[site]||[]).forEach(function(a){ addToIndex(a, site, 'alias'); });
+  /* a spot that is itself one of the places ("Nainital", listed under Bhowali) would
+     show up twice, so only the place is kept */
+  PLACES[site].spots.forEach(function(s){
+    if(PLACE_KEYS.indexOf(norm(s[0])) < 0) addToIndex(s[0], site, 'spot');
+  });
+});
+
+function score(q, c){
+  var i;
+  if(c.n === q.n) return 100;
+  if(c.n.indexOf(q.n) === 0) return 92;
+  for(i=0;i<c.words.length;i++) if(c.words[i].n.indexOf(q.n) === 0) return 86;
+  if(q.n.length >= 3 && c.n.indexOf(q.n) > -1) return 78;
+  if(q.s.length >= 2 && c.s === q.s) return 76;
+  if(q.s.length >= 3){
+    for(i=0;i<c.words.length;i++) if(c.words[i].s === q.s) return 72;
+    if(c.s.indexOf(q.s) === 0) return 66;
+  }
+  var flat = q.n.replace(/ /g,''), best = likeness(flat, c.n.replace(/ /g,''));
+  for(i=0;i<c.words.length;i++) best = Math.max(best, likeness(flat, c.words[i].n));
+  return best >= 0.6 ? Math.round(best*70) : 0;
+}
+
+function search(text){
+  var qn = norm(text);
+  if(!qn) return [];
+  var q = {n:qn, s:sound(qn)}, hits = [], seen = {};
+  INDEX.forEach(function(c){
+    if(c.kind === 'spot' && qn.length < 4) return;
+    var sc = score(q, c) * (c.kind === 'spot' ? 0.85 : 1);
+    if(sc >= 45) hits.push({site:c.site, label:c.kind==='spot' ? c.label : c.site, kind:c.kind==='spot' ? 'spot' : 'place', score:sc});
+  });
+  hits.sort(function(a,b){ return b.score - a.score || (a.kind==='place' ? -1 : 1); });
+  return hits.filter(function(h){
+    var key = h.kind==='place' ? h.site : h.label+'|'+h.site;
+    if(seen[key]) return false;
+    seen[key] = 1; return true;
+  }).slice(0, 7);
+}
+
+/* ============================================================
+   2. The search box, the suggestions, the date
+   ============================================================ */
+var form = $('search'), qIn = $('q'), dIn = $('d'), sugEl = $('suggest'), msgEl = $('msg');
+var sugHits = [], sugActive = -1;
+
+var today = midnight(new Date());
+var firstDay = today > START ? today : START;
+dIn.min = iso(firstDay);
+dIn.max = iso(END);
+dIn.value = iso(firstDay > END ? END : firstDay);
+
+function readDate(){
+  var d = new Date(dIn.value+'T00:00:00');
+  if(isNaN(d) || d < firstDay) d = firstDay;
+  if(d > END) d = END;
+  return d;
+}
+
+function openSuggest(list){
+  sugHits = list; sugActive = -1;
+  if(!list.length){ closeSuggest(); return; }
+  sugEl.innerHTML = list.map(function(h, i){
+    var kind = h.kind === 'spot' ? 'in '+h.site : PLACES[h.site].kind;
+    return '<li role="option" id="sg-'+i+'" data-i="'+i+'" aria-selected="false">'+
+           '<span class="nm">'+esc(h.label)+'</span><span class="kd">'+esc(kind)+'</span></li>';
+  }).join('');
+  sugEl.hidden = false;
+  qIn.setAttribute('aria-expanded','true');
+}
+function closeSuggest(){
+  sugEl.hidden = true; sugHits = []; sugActive = -1;
+  qIn.setAttribute('aria-expanded','false');
+  qIn.removeAttribute('aria-activedescendant');
+}
+function moveActive(step){
+  if(!sugHits.length) return;
+  sugActive = (sugActive + step + sugHits.length) % sugHits.length;
+  [].forEach.call(sugEl.children, function(li, i){ li.setAttribute('aria-selected', i===sugActive); });
+  qIn.setAttribute('aria-activedescendant','sg-'+sugActive);
+  sugEl.children[sugActive].scrollIntoView({block:'nearest'});
+}
+function popularHits(){
+  return POPULAR.map(function(n){ return {site:n, label:n, kind:'place', score:100}; });
+}
+
+qIn.addEventListener('input', function(){
+  openSuggest(qIn.value.trim() ? search(qIn.value) : popularHits());
+});
+qIn.addEventListener('focus', function(){
+  if(!qIn.value.trim()) openSuggest(popularHits());
+});
+qIn.addEventListener('keydown', function(e){
+  if(e.key === 'ArrowDown'){ e.preventDefault(); if(sugEl.hidden) openSuggest(qIn.value.trim() ? search(qIn.value) : popularHits()); else moveActive(1); }
+  else if(e.key === 'ArrowUp'){ e.preventDefault(); moveActive(-1); }
+  else if(e.key === 'Escape'){ closeSuggest(); }
+  /* handled here rather than left to the form's implicit submit, so Enter always
+     takes the highlighted suggestion */
+  else if(e.key === 'Enter'){ e.preventDefault(); submitSearch(); }
+});
+qIn.addEventListener('blur', function(){ setTimeout(closeSuggest, 150); });
+/* mousedown, not click, so the pick lands before the input loses focus */
+sugEl.addEventListener('mousedown', function(e){
+  var li = e.target.closest('li'); if(!li) return;
+  e.preventDefault();
+  choose(sugHits[+li.getAttribute('data-i')], qIn.value);
+});
+
+function submitSearch(){
+  var typed = qIn.value;
+  if(!typed.trim()){ qIn.focus(); openSuggest(popularHits()); return; }
+  var hit = sugActive > -1 ? sugHits[sugActive] : search(typed)[0];
+  choose(hit, typed);
+}
+form.addEventListener('submit', function(e){ e.preventDefault(); submitSearch(); });
+
+function choose(hit, typed){
+  closeSuggest();
+  if(!hit){ notFound(typed); return; }
+  var site = hit.site, t = norm(typed||''), note = '';
+  if(hit.kind === 'spot'){
+    note = '<b>'+esc(hit.label)+'</b> is in '+esc(site)+', so here is '+esc(site)+'.';
+  } else if(t && norm(site).indexOf(t) !== 0 && !(ALIAS[site]||[]).some(function(a){ return a.indexOf(t) === 0; })){
+    note = 'Showing <b>'+esc(site)+'</b> for “'+esc(typed.trim())+'”.';
+  }
+  msgEl.innerHTML = note;
+  qIn.value = site;
+  show(site, readDate(), {scroll:true, push:true});
+}
+
+function notFound(typed){
+  $('out').hidden = true;
+  msgEl.innerHTML = 'We could not find “'+esc(typed.trim())+'”. Shaant covers these '+NAMES.length+
+    ' places in Uttarakhand for now:<div class="all">'+
+    NAMES.map(function(n){ return '<button type="button" class="chip" data-site="'+esc(n)+'">'+esc(n)+'</button>'; }).join('')+
+    '</div>';
+}
+msgEl.addEventListener('click', function(e){
+  var b = e.target.closest('[data-site]'); if(!b) return;
+  choose({site:b.getAttribute('data-site'), label:b.getAttribute('data-site'), kind:'place'}, '');
+});
+
+$('popular').insertAdjacentHTML('beforeend', POPULAR.map(function(n){
+  return '<button type="button" class="chip" data-site="'+esc(n)+'">'+esc(n.replace(' National Park',''))+'</button>';
+}).join(''));
+$('popular').addEventListener('click', function(e){
+  var b = e.target.closest('[data-site]'); if(!b) return;
+  choose({site:b.getAttribute('data-site'), label:'', kind:'place'}, '');
+});
+
+dIn.addEventListener('change', function(){
+  if(current.site) show(current.site, readDate(), {});
+});
+
+/* ============================================================
+   3. Showing a place
+   ============================================================ */
+var current = {site:null, date:null};
+var renderToken = 0;
+
+function show(site, d, opts){
+  opts = opts || {};
+  var siteChanged = site !== current.site;
+  current.site = site; current.date = d;
+  var token = ++renderToken, meta = PLACES[site];
+
+  $('out').hidden = false;
+  $('hero').classList.add('compact');
+  document.title = site+' · Shaant';
+
+  $('p-kind').textContent = meta.kind+' · '+meta.alt.toLocaleString('en-IN')+' m up';
+  $('p-name').textContent = site;
+  $('p-when').textContent = longDate(d);
+
+  renderCrowd(site, d);
+  renderWeather(site, d, token);
+  if(siteChanged){
+    renderStays(site);
+    renderSpots(site);
+    renderRoute(site);
+  }
+
+  var h = '#'+slug(site)+'/'+iso(d);
+  if(location.hash !== h){
+    try{ history[opts.push && siteChanged ? 'pushState' : 'replaceState'](null, '', h); }
+    catch(e){ location.hash = h; }
+  }
+  if(opts.scroll) $('head').scrollIntoView({behavior: reduceMotion.matches ? 'auto' : 'smooth', block:'start'});
+}
+
+/* ---------- crowd ---------- */
+var CROWD = {
+  M:{word:'Not crowded', n:1, cls:'quiet', rank:0, say:'Quiet roads and easy rooms. A good day to go.'},
+  S:{word:'Normal crowd', n:2, cls:'steady', rank:1, say:'The usual number of people. Book a day or two ahead.'},
+  O:{word:'Very crowded', n:3, cls:'busy', rank:2, say:'Queues, slow traffic and full hotels. Book early, or pick another day.'}
+};
+
+function lookup(site, d){
+  var i = daysBetween(START, d);
+  if(i < 0 || i >= P.days) return null;
+  var S = P.sites[site];
+  if(!S) return null;
+  var vi = (d.getMonth()*31 + (d.getDate()-1))*3;
+  return {code:S.c.charAt(i), conf:parseInt(S.p.substr(i*2,2),10), vis:parseInt(S.v.substr(vi,3),10)};
+}
+
+/* nearest day, up to three weeks either side, that is less crowded than this one */
+function quieterDay(site, d, rank){
+  if(rank === 0) return null;
+  for(var off=1; off<=21; off++){
+    for(var s=1; s>=-1; s-=2){
+      var p = new Date(d.getFullYear(), d.getMonth(), d.getDate()+off*s);
+      if(p < firstDay) continue;
+      var r = lookup(site, p);
+      if(r && CROWD[r.code].rank < rank) return {d:p, c:CROWD[r.code]};
+    }
+  }
+  return null;
+}
+
+function renderCrowd(site, d){
+  var el = $('crowd'), r = lookup(site, d);
+  el.className = 'g crowd';
+  if(!r){
+    el.innerHTML = '<p class="lab">Crowd</p><p class="big">No forecast</p>'+
+      '<p class="say">Crowd forecasts run from '+longDate(START)+' to '+longDate(END)+'.</p>';
+    return;
+  }
+  var C = CROWD[r.code], people = '';
+  el.classList.add(C.cls);
+  for(var i=1;i<=3;i++) people += icon('person', i<=C.n ? 'on' : '');
+  var html = '<p class="lab">Crowd</p>'+
+    '<div class="people" aria-hidden="true">'+people+'</div>'+
+    '<p class="big">'+C.word+'</p>'+
+    '<p class="say">'+C.say+'</p>'+
+    '<p class="small">About '+r.vis.toLocaleString('en-IN')+' visitors expected that day. The model is '+r.conf+'% sure.</p>';
+  var q = quieterDay(site, d, C.rank);
+  if(q){
+    html += '<div class="foot"><button type="button" class="btn-line" data-date="'+iso(q.d)+'">'+
+            q.c.word+' on '+shortDate(q.d)+'</button></div>';
+  }
+  el.innerHTML = html;
+}
+$('crowd').addEventListener('click', function(e){
+  var b = e.target.closest('[data-date]'); if(!b) return;
+  dIn.value = b.getAttribute('data-date');
+  show(current.site, readDate(), {});
+});
+
+/* ---------- weather ---------- */
+/* Typical Dehradun weather, used only when the live service cannot be reached.
+   [words, low, high, a WMO code for the icon]. Shifted by altitude below. */
+var CLIMATE = {
+ 1:["Cool and dry",8,20,1], 2:["Pleasant",10,23,2], 3:["Mild",14,27,1], 4:["Warm",18,31,1],
+ 5:["Warm",21,34,2], 6:["Monsoon begins",20,30,80], 7:["Rainy",19,28,63], 8:["Rainy",18,27,63],
+ 9:["Fresh after monsoon",17,27,80], 10:["Clear and cool",12,25,0], 11:["Cool",8,21,0], 12:["Cold",5,18,1]
+};
+var WX_TONE = {sun:'#f2c46d', part:'#d8e2ef', cloud:'#b9c7d8', fog:'#93a4ba', rain:'#8fb8ff', storm:'#c7a8f4', snow:'#eaf0f7'};
+var wxCache = {};
+
+function wxKind(code){
+  if(code === 0) return ['sun','Clear sky'];
+  if(code === 1) return ['sun','Mostly sunny'];
+  if(code === 2) return ['part','Partly cloudy'];
+  if(code === 3) return ['cloud','Cloudy'];
+  if(code === 45 || code === 48) return ['fog','Foggy'];
+  if(code >= 51 && code <= 57) return ['rain','Light drizzle'];
+  if(code === 61 || code === 80) return ['rain','Light rain'];
+  if(code === 65 || code === 82) return ['rain','Heavy rain'];
+  if((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return ['rain','Rain'];
+  if((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snow','Snow'];
+  if(code >= 95) return ['storm','Thunderstorms'];
+  return ['cloud','Mixed weather'];
+}
+function wxWhere(site){ var m = PLACES[site]; return m.hub && m.hub !== site ? m.hub : site; }
+function llParam(site){ var ll = PLACES[site].ll; return 'latitude='+ll[0]+'&longitude='+ll[1]; }
+
+function forecastFor(site, d){
+  if(!wxCache[site]){
+    wxCache[site] = fetchJSON('https://api.open-meteo.com/v1/forecast?'+llParam(site)+
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'+
+      '&current=temperature_2m,weather_code&timezone=Asia%2FKolkata&forecast_days=16')
+      .catch(function(e){ delete wxCache[site]; throw e; });
+  }
+  return wxCache[site].then(function(j){
+    var D = j.daily, i = D.time.indexOf(iso(d));
+    if(i < 0 || D.temperature_2m_max[i] == null) throw new Error('date not in forecast');
+    var w = {kind:'forecast', hi:D.temperature_2m_max[i], lo:D.temperature_2m_min[i],
+             code:D.weather_code[i], rain:D.precipitation_probability_max[i]};
+    if(i === 0 && j.current) w.now = {t:j.current.temperature_2m, code:j.current.weather_code};
+    return w;
+  });
+}
+
+/* Too far ahead for a forecast: show what the same week actually did last year. */
+function lastYearFor(site, d){
+  var y = today.getFullYear()-1;
+  var a = new Date(y, d.getMonth(), d.getDate()-3), b = new Date(y, d.getMonth(), d.getDate()+3);
+  return fetchJSON('https://archive-api.open-meteo.com/v1/archive?'+llParam(site)+
+    '&start_date='+iso(a)+'&end_date='+iso(b)+
+    '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=Asia%2FKolkata')
+    .then(function(j){
+      var D = j.daily, hi = 0, lo = 0, n = 0, wet = 0, votes = {}, top = null;
+      for(var i=0;i<D.time.length;i++){
+        if(D.temperature_2m_max[i] == null || D.temperature_2m_min[i] == null) continue;
+        hi += D.temperature_2m_max[i]; lo += D.temperature_2m_min[i]; n++;
+        if(D.precipitation_sum[i] >= 1) wet++;
+        var c = D.weather_code[i];
+        votes[c] = (votes[c]||0) + 1;
+        if(top === null || votes[c] > votes[top] || (votes[c] === votes[top] && c > top)) top = c;
+      }
+      if(!n) throw new Error('no archive data');
+      return {kind:'lastyear', hi:hi/n, lo:lo/n, code:top, wetDays:wet, days:n, year:y};
+    });
+}
+
+function typicalFor(site, d){
+  var m = PLACES[site], c = CLIMATE[d.getMonth()+1];
+  var drop = 6.5*((m.halt || m.alt) - 640)/1000;          /* about 6.5 degrees per 1,000 m of height */
+  var lo = c[1]-drop, code = c[3];
+  if(lo < 0 && (d.getMonth() < 2 || d.getMonth() === 11)) code = 71;
+  return {kind:'typical', hi:c[2]-drop, lo:lo, code:code, words:c[0]};
+}
+
+/* the two things most worth packing, in plain words */
+function whatToCarry(lo, hi, wet, snowy){
+  var t = [];
+  if(snowy) t.push('snow boots');
+  if(lo <= 5) t.push('heavy woollens');
+  else if(lo <= 14) t.push('a warm jacket');
+  if(wet) t.push('an umbrella');
+  if(hi >= 30) t.push('light cotton clothes');
+  if(!t.length) t.push('a light sweater for the evening');
+  return 'Carry '+t.slice(0, 2).join(' and ')+'.';
+}
+
+function renderWeather(site, d, token){
+  var el = $('weather'), where = wxWhere(site);
+  var lab = '<p class="lab">Weather'+(where !== site ? ' in '+esc(where) : '')+'</p>';
+  el.style.removeProperty('--tone');
+  el.innerHTML = lab+'<div class="wrow">'+icon('cloud')+'<p class="big"><span class="skel"></span></p></div>'+
+    '<p class="say"><span class="skel" style="width:16ch"></span></p>';
+  var ahead = daysBetween(today, d);
+  var job = ahead >= 0 && ahead <= 15 ? forecastFor(site, d) : lastYearFor(site, d);
+  job.catch(function(){ return typicalFor(site, d); }).then(function(w){
+    if(token !== renderToken) return;
+    var k = wxKind(w.code), hi = Math.round(w.hi), lo = Math.round(w.lo);
+    var wet = (w.rain != null && w.rain >= 40) || k[0] === 'rain' || k[0] === 'storm' || w.wetDays >= 3;
+    var say, src, now = '';
+    if(w.kind === 'forecast'){
+      say = k[1]+(w.rain != null ? ' · '+w.rain+'% chance of rain' : '');
+      src = 'Forecast for '+shortDate(d)+', from Open-Meteo.';
+      if(w.now) now = '<p class="small">Right now it is '+Math.round(w.now.t)+'° and '+wxKind(w.now.code)[1].toLowerCase()+'.</p>';
+    } else if(w.kind === 'lastyear'){
+      say = 'Mostly '+k[1].toLowerCase()+' · rain on '+w.wetDays+' of '+w.days+' days';
+      src = 'Too far ahead for a forecast, so this is the same week in '+w.year+', from Open-Meteo.';
+    } else {
+      say = w.words+' in '+MONTHS[d.getMonth()];
+      src = 'Typical for '+MONTHS[d.getMonth()]+'. The live forecast needs an internet connection.';
+    }
+    el.style.setProperty('--tone', WX_TONE[k[0]]);
+    el.innerHTML = lab+
+      '<div class="wrow">'+icon(k[0])+'<p class="big">'+hi+'° <span class="lo">/ '+lo+'°</span>'+
+        '<span class="sr"> High '+hi+', low '+lo+' degrees.</span></p></div>'+
+      '<p class="say">'+say+'</p>'+now+
+      '<p class="small">'+whatToCarry(lo, hi, wet, k[0] === 'snow')+'</p>'+
+      '<p class="src foot">'+src+'</p>';
+  });
+}
+
+/* ---------- carousel: three across, arrows either side, wraps round at the ends ---------- */
+function makeCarousel(root){
+  var track = root.querySelector('.track'), countEl = root.querySelector('.car-count');
+  var dotsEl = root.querySelector('.car-dots'), prev = root.querySelector('.prev'), next = root.querySelector('.next'), raf = 0;
+  prev.innerHTML = icon('left');
+  next.innerHTML = icon('right');
+  function gap(){ return parseFloat(getComputedStyle(track).columnGap) || 0; }
+  /* layout offsets, not getBoundingClientRect: the edge animation scales cards that are
+     scrolled out of view, and a scaled width would make every step come up short */
+  function stepW(){
+    var a = track.children[0], b = track.children[1];
+    return b ? b.offsetLeft - a.offsetLeft : a ? a.offsetWidth + gap() : 1;
+  }
+  function measure(){
+    var s = stepW(), n = track.children.length;
+    var per = Math.max(1, Math.floor((track.clientWidth + gap() + 2)/s));
+    return {n:n, per:per, max:track.scrollWidth - track.clientWidth,
+            first:Math.min(Math.round(track.scrollLeft/s), Math.max(0, n-per))};
+  }
+  function update(){
+    var m = measure(), moves = m.max > 2;
+    root.classList.toggle('static', !moves);
+    countEl.textContent = !m.n ? '' : !moves ? m.n+(m.n === 1 ? ' result' : ' results')
+      : m.per === 1 ? (m.first+1)+' of '+m.n
+      : (m.first+1)+'–'+Math.min(m.n, m.first+m.per)+' of '+m.n;
+    [].forEach.call(dotsEl.children, function(d, i){ d.classList.toggle('on', i >= m.first && i < m.first+m.per); });
+  }
+  function go(dir){
+    var m = measure(), how = reduceMotion.matches ? 'auto' : 'smooth', x = track.scrollLeft, half = stepW()/2;
+    if(m.max <= 2) return;
+    /* within half a card of an end counts as the end, so a click during a settling scroll still wraps */
+    if(dir > 0 && x >= m.max-half) track.scrollTo({left:0, behavior:how});        /* past the last: round to the first */
+    else if(dir < 0 && x <= half) track.scrollTo({left:m.max, behavior:how});     /* before the first: round to the last */
+    else track.scrollBy({left:dir*stepW(), behavior:how});
+  }
+  prev.addEventListener('click', function(){ go(-1); });
+  next.addEventListener('click', function(){ go(1); });
+  track.addEventListener('keydown', function(e){
+    if(e.target !== track) return;
+    if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+  });
+  track.addEventListener('scroll', function(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(update); }, {passive:true});
+  window.addEventListener('resize', update);
+  return {
+    fill:function(html){
+      track.innerHTML = html;
+      /* each card goes in a plain slot: the slot is what snaps, the card inside is what the
+         edge animation scales, so the scaling can never shift a snap point */
+      [].slice.call(track.children).forEach(function(card){
+        var slot = document.createElement('div');
+        slot.className = 'slot';
+        track.replaceChild(slot, card);
+        slot.appendChild(card);
+      });
+      dotsEl.innerHTML = new Array(track.children.length+1).join('<span></span>');
+      track.scrollTo({left:0, behavior:'instant'});
+      update();
+    }
+  };
+}
+var stayCar = makeCarousel($('stay-car')), spotCar = makeCarousel($('spot-car'));
+
+/* ---------- where to stay: a budget you drag or type, never a label ---------- */
+var B_MIN = 500, B_MAX = 50000, B_LOG = Math.log(B_MAX/B_MIN);
+var bIn = $('b-in'), bRange = $('b-range'), bFit = $('b-fit'), bMarks = $('b-marks'), emptyEl = $('stays-empty');
+var stayList = [], budget = +load('shaant.budget') || 5000, bRaf = 0;
+
+/* the bar is logarithmic, so ₹500 to ₹5,000 gets as much room as ₹5,000 to ₹50,000 */
+function barPos(v){ return Math.max(0, Math.min(1, Math.log(Math.max(v, B_MIN)/B_MIN)/B_LOG)); }
+function barValue(p){
+  var v = B_MIN*Math.exp(p*B_LOG), step = v < 5000 ? 100 : v < 20000 ? 500 : 1000;
+  return Math.round(v/step)*step;
+}
+$('b-scale').innerHTML = [500, 2000, 5000, 15000, 50000].map(function(v){
+  return '<span style="--p:'+barPos(v).toFixed(4)+'">'+rupees(v).replace(/,000$/,'k')+'</span>';
+}).join('');
+
+/* A stay fits when its cheapest room is within budget. Best match first: stays whose
+   price range takes in the budget, then the ones just under it. */
+function gapTo(s, b){ return b > s.p[1] ? b - s.p[1] : 0; }
+function fitting(b){
+  return stayList.filter(function(s){ return s.p[0] <= b; })
+                 .sort(function(x, y){ return gapTo(x, b) - gapTo(y, b) || y.p[0] - x.p[0]; });
+}
+function stayIcon(t){
+  t = t.toLowerCase();
+  if(/hostel/.test(t)) return 'hostel';
+  if(/heritage|boutique/.test(t)) return 'heritage';
+  if(/resort/.test(t)) return 'resort';
+  if(/government|forest rest/.test(t)) return 'lodge';
+  if(/homestay|guesthouse/.test(t)) return 'home';
+  if(/camp/.test(t)) return 'camp';
+  if(/ashram|dharamshala|gurdwara/.test(t)) return 'temple';
+  return 'hotel';
+}
+
+/* card tint follows the kind of stay, never the price */
+function stayGroup(t){
+  return {hotel:'a', resort:'a', heritage:'b', home:'c', hostel:'c', lodge:'d', temple:'d', camp:'d'}[stayIcon(t)];
+}
+
+function renderStays(site){
+  stayList = STAYS[site] || [];
+  /* one tick on the bar per stay, at its cheapest room, so you can see what a little more buys */
+  bMarks.innerHTML = stayList.map(function(s){ return '<i style="--p:'+barPos(s.p[0]).toFixed(4)+'"></i>'; }).join('');
+  setBudget(budget);
+}
+
+function setBudget(v, from){
+  budget = v;
+  if(from !== 'range') bRange.value = Math.round(barPos(v)*1000);
+  if(from !== 'type') bIn.value = v.toLocaleString('en-IN');
+  bRange.style.setProperty('--fill', (bRange.value/10)+'%');
+  save('shaant.budget', v);
+  cancelAnimationFrame(bRaf);
+  bRaf = requestAnimationFrame(function(){ if(current.site) paintStays(current.site); });
+}
+
+function paintStays(site){
+  var town = PLACES[site].hub || site, rows = fitting(budget);
+  [].forEach.call(bMarks.children, function(m, i){ m.classList.toggle('in', stayList[i].p[0] <= budget); });
+  bFit.innerHTML = rows.length
+    ? '<b>'+rows.length+'</b> of '+stayList.length+' stays fit your budget'+(rows.length > 10 ? ', top 10 shown' : '')
+    : 'None fit yet';
+  if(!rows.length){
+    var cheapest = Math.min.apply(null, stayList.map(function(s){ return s.p[0]; }));
+    emptyEl.innerHTML = stayList.length
+      ? 'Nothing listed in '+esc(site)+' starts under '+rupees(budget)+'. The cheapest here starts at about '+rupees(cheapest)+'.'+
+        '<br><button type="button" class="chip" data-budget="'+cheapest+'">Set my budget to '+rupees(cheapest)+'</button>'
+      : 'No stays are listed for '+esc(site)+' yet.';
+    emptyEl.hidden = false;
+    $('stay-car').hidden = true;
+    return;
+  }
+  emptyEl.hidden = true;
+  $('stay-car').hidden = false;
+  stayCar.fill(rows.slice(0, 10).map(function(s){
+    var q = s.q || s.n+', '+town;
+    var map = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q+', Uttarakhand');
+    var price = s.pl ? esc(s.pl) : rupees(s.p[0])+' to '+rupees(s.p[1])+' <small>a night</small>';
+    var links = '<a class="lnk" href="'+map+'" target="_blank" rel="noopener">'+(s.g ? 'See them on map' : 'See on map')+
+                '<span class="sr"> for '+esc(s.n)+'</span>'+icon('arrow')+'</a>';
+    if(!s.g){
+      links += '<a class="lnk" href="https://www.google.com/search?q='+encodeURIComponent(s.n+' '+town+' price')+
+               '" target="_blank" rel="noopener">Check price<span class="sr"> for '+esc(s.n)+'</span>'+icon('arrow')+'</a>';
+    }
+    return '<article class="stay" data-g="'+stayGroup(s.t)+'">'+
+             '<div class="art">'+icon(stayIcon(s.t), 'ic')+
+               '<p class="ty">'+esc(s.t)+(s.g ? '<em>several to choose from</em>' : '')+'</p></div>'+
+             '<div class="body"><h4>'+esc(s.n)+'</h4><p class="price">'+price+'</p>'+
+               '<p class="d">'+esc(s.d)+'</p><div class="links">'+links+'</div></div>'+
+           '</article>';
+  }).join(''));
+}
+
+bRange.addEventListener('input', function(){ setBudget(barValue(bRange.value/1000), 'range'); });
+/* typing updates as you go; the number is tidied into ₹4,500 form when you leave the box */
+bIn.addEventListener('input', function(){
+  var digits = bIn.value.replace(/\D/g, '');
+  if(digits) setBudget(Math.min(+digits, 999999), 'type');
+});
+bIn.addEventListener('blur', function(){ bIn.value = budget.toLocaleString('en-IN'); });
+bIn.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); bIn.blur(); } });
+emptyEl.addEventListener('click', function(e){
+  var b = e.target.closest('[data-budget]'); if(b) setBudget(+b.getAttribute('data-budget'));
+});
+
+/* ---------- places to see ---------- */
+var SPOT_ICON = {"Kanatal":"town", "Gaurikund":"town", "Govindghat":"town", "Aquarium Island":"lake",
+                 "Auli Ropeway":"peak", "Valley of Flowers":"tree", "Har Ki Pauri":"river",
+                 "George Everest's House":"heritage"};
+function spotIcon(name){
+  if(SPOT_ICON[name]) return SPOT_ICON[name];
+  var n = name.toLowerCase();
+  if(/museum|institute|church/.test(n)) return 'heritage';
+  if(/temple|mandir|dham|devi|mahadev|sahib|monastery|ashram|shila|paduka/.test(n)) return 'temple';
+  if(/fall|sahastradhara/.test(n)) return 'fall';
+  if(/ghat|jhula|river|prayag|shivpuri/.test(n)) return 'river';
+  if(/lake|tal\b|talab|kund|sarovar|dam/.test(n)) return 'lake';
+  if(/cave|gufa/.test(n)) return 'cave';
+  if(/park|garden|forest|zone|sanctuary|zoo|reserve|gate|orchard|estate|golf/.test(n)) return 'tree';
+  if(/point|top|peak|view|corner|tibba|chauli|bugyal|meadow|camp|glacier|gaumukh|junargali|nandanvan|end\b/.test(n)) return 'peak';
+  return 'town';
+}
+
+function renderSpots(site){
+  var meta = PLACES[site], town = meta.hub || site;
+  var spots = meta.spots.slice().sort(function(a,b){ return a[1]-b[1]; }).slice(0, 10);
+  $('see-h').textContent = 'Places to see in '+site;
+  spotCar.fill(spots.map(function(s){
+    var name = s[0], km = s[1], text = s[2];
+    /* a name that already names its own town is specific enough; the rest need the
+       town added, or "Sunset Point" and "Mall Road" land anywhere in India */
+    var query = (name.indexOf(',') > -1 ? name : name+', '+town)+', Uttarakhand';
+    var href, label;
+    if(km === 0){
+      href = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
+      label = 'View on map';
+    } else {
+      href = 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(town+', Uttarakhand')+
+             '&destination='+encodeURIComponent(query)+'&travelmode=driving';
+      label = 'Directions';
+    }
+    var far = km === 0 ? '<span class="km here">In the centre</span>' : '<span class="km">'+km+' km away</span>';
+    return '<article class="spot">'+
+             '<div class="row"><span class="ic">'+icon(spotIcon(name))+'</span><div><h4>'+esc(name)+'</h4>'+far+'</div></div>'+
+             '<p>'+esc(text)+'</p>'+
+             '<div class="links"><a class="lnk" href="'+href+'" target="_blank" rel="noopener">'+label+
+               '<span class="sr"> for '+esc(name)+'</span>'+icon('arrow')+'</a></div>'+
+           '</article>';
+  }).join(''));
+  $('spots-note').textContent = 'Nearest first. Distances are rough, by road from the centre of '+town+
+    '. Tap Directions for the exact route.';
+}
+
+/* ============================================================
+   4. How far is it: your location to the place, on a map
+   ============================================================ */
+var origin = load('shaant.origin');           /* {lat, lon, label, elev} */
+var map = null, L = null, destLayer = null, routeLayer = null, leafletP = null, routeToken = 0;
+var rsumEl = $('rsum'), farEl = $('far');
+
+$('locate').innerHTML = icon('locate')+'Use my location';
+
+function endpoint(site){
+  var m = PLACES[site];
+  if(m.road) return {name:m.road.n, ll:m.road.ll, alt:m.road.alt || m.alt};
+  return {name:m.hub || site, ll:m.ll, alt:m.halt || m.alt};
+}
+
+function loadLeaflet(){
+  if(window.L) return Promise.resolve(window.L);
+  if(leafletP) return leafletP;
+  leafletP = new Promise(function(resolve, reject){
+    var css = document.createElement('link'), js = document.createElement('script'), left = 2;
+    function done(){ if(--left === 0) window.L ? resolve(window.L) : reject(new Error('no Leaflet')); }
+    function fail(){ leafletP = null; reject(new Error('Leaflet did not load')); }
+    css.rel = 'stylesheet'; css.href = LEAFLET+'leaflet.css'; css.onload = done; css.onerror = fail;
+    js.src = LEAFLET+'leaflet.js'; js.onload = done; js.onerror = fail;
+    document.head.appendChild(css); document.head.appendChild(js);
+  });
+  return leafletP;
+}
+
+function ensureMap(){
+  return loadLeaflet().then(function(lib){
+    L = lib;
+    if(map){ map.invalidateSize(); return map; }
+    $('map').innerHTML = '';
+    map = L.map('map', {scrollWheelZoom:false, zoomSnap:0.5});
+    addTiles(0);
+    /* wheel zoom only once the reader has clicked into the map, so the page still scrolls */
+    map.on('click focus', function(){ map.scrollWheelZoom.enable(); });
+    map.on('mouseout blur', function(){ map.scrollWheelZoom.disable(); });
+    destLayer = L.layerGroup().addTo(map);
+    routeLayer = L.layerGroup().addTo(map);
+    return map;
+  });
+}
+/* Tile servers that work with no API key and no Referer header, which matters because
+   a double-clicked file sends none: OpenStreetMap's own tiles refuse such requests and
+   CARTO now wants a key. If the first server fails before drawing anything, use the next. */
+var TILES = [
+  {url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+   opts:{maxZoom:17, attribution:'Tiles &copy; Esri, HERE, Garmin, USGS, &copy; OpenStreetMap contributors'}},
+  {url:'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+   opts:{subdomains:'abc', maxZoom:17, attribution:'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM. Style &copy; OpenTopoMap (CC-BY-SA)'}}
+];
+function addTiles(i){
+  var layer = L.tileLayer(TILES[i].url, TILES[i].opts), drawn = false, errors = 0;
+  layer.on('tileload', function(){ drawn = true; });
+  layer.on('tileerror', function(){
+    if(drawn || ++errors < 3 || i+1 >= TILES.length) return;
+    map.removeLayer(layer);
+    addTiles(i+1);
+  });
+  layer.addTo(map);
+}
+function pinIcon(cls, text){
+  return L.divIcon({className:'pin '+cls, html:'<i></i><b>'+esc(text)+'</b>', iconSize:[20,20], iconAnchor:[10,10]});
+}
+function mapOffline(){
+  $('map').innerHTML = '<p class="map-off">The map needs an internet connection. The Google Maps button below still works when you are back online.</p>';
+}
+
+function haversine(a, b){
+  var R = 6371, r = Math.PI/180, dLat = (b[0]-a[0])*r, dLon = (b[1]-a[1])*r;
+  var h = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+/* OSRM's free server assumes open roads at the speed limit. That runs about a third fast
+   on Indian highways and far faster than anyone drives up a hill road. 1.35x its time,
+   plus 25 minutes for every 1,000 m of climb, lands close to usual drive times on the
+   routes it was checked against (Delhi to Mussoorie, Nainital, Rishikesh and Badrinath,
+   Dehradun to Mussoorie). */
+function driveMinutes(seconds, fromAlt, toAlt){
+  var climb = Math.max(0, (toAlt || 0) - (fromAlt == null ? 300 : fromAlt));
+  return seconds/60*1.35 + climb/1000*25;
+}
+function fmtMinutes(m){
+  if(m < 55) return 'about '+Math.max(5, Math.round(m/5)*5)+' min';
+  var step = m < 180 ? 15 : 30, r = Math.round(m/step)*step, h = Math.floor(r/60), mm = r%60;
+  return 'about '+h+' h'+(mm ? ' '+mm+' min' : '');
+}
+function fmtKm(km){ return (km < 10 ? km.toFixed(1) : Math.round(km).toLocaleString('en-IN'))+' km'; }
+
+function gmapsLink(site){
+  var D = endpoint(site), url = 'https://www.google.com/maps/dir/?api=1&destination='+
+    encodeURIComponent(D.name+', Uttarakhand')+'&travelmode=driving';
+  if(origin) url += '&origin='+origin.lat+','+origin.lon;
+  $('gmaps').href = url;
+}
+
+function farTileAsk(){
+  farEl.innerHTML = '<p class="lab">How far</p><p class="big">From you?</p>'+
+    '<p class="say">See the distance and drive time from where you are.</p>'+
+    '<div class="foot"><button type="button" class="btn-line" data-act="locate">'+icon('locate')+'Use my location</button>'+
+    '<button type="button" class="btn-line" data-act="type">Type a city</button></div>';
+}
+function farTileBusy(){
+  farEl.innerHTML = '<p class="lab">How far</p><p class="big"><span class="skel"></span></p>'+
+    '<p class="say"><span class="skel" style="width:18ch"></span></p>';
+}
+farEl.addEventListener('click', function(e){
+  var b = e.target.closest('[data-act]'); if(!b) return;
+  if(b.getAttribute('data-act') === 'locate') locate();
+  else if(b.getAttribute('data-act') === 'route') $('route').scrollIntoView({behavior: reduceMotion.matches ? 'auto' : 'smooth'});
+  else { $('route').scrollIntoView({behavior: reduceMotion.matches ? 'auto' : 'smooth'}); $('from').focus({preventScroll:true}); }
+});
+
+function status(text){ rsumEl.innerHTML = '<p class="status">'+text+'</p>'; }
+
+function renderRoute(site){
+  var meta = PLACES[site], D = endpoint(site);
+  $('route-h').textContent = 'How far is '+site+' from you?';
+  var go = $('go-note');
+  if(meta.go){ go.innerHTML = icon('info')+'<span>'+esc(meta.go)+'</span>'; go.hidden = false; }
+  else go.hidden = true;
+  gmapsLink(site);
+  if(origin){ drawRoute(site); }
+  else { farTileAsk(); status('Tap <b>Use my location</b>, or type the city you are starting from.'); }
+  ensureMap().then(function(){
+    if(site !== current.site) return;
+    destLayer.clearLayers();
+    L.marker(D.ll, {icon:pinIcon('to', D.name), keyboard:false}).addTo(destLayer);
+    if(!origin){ routeLayer.clearLayers(); map.setView(D.ll, 10); }
+  }).catch(mapOffline);
+}
+
+function drawRoute(site){
+  var token = ++routeToken, D = endpoint(site), from = [origin.lat, origin.lon];
+  var crow = haversine(from, D.ll);
+  gmapsLink(site);
+  farTileBusy();
+  status('Working out the route…');
+
+  if(crow < 2){
+    paintDistance(site, {here:true});
+    ensureMap().then(function(){ if(token === routeToken){ routeLayer.clearLayers(); map.setView(D.ll, 12); } }).catch(mapOffline);
+    return;
+  }
+
+  var road = fetchJSON('https://router.project-osrm.org/route/v1/driving/'+
+      origin.lon+','+origin.lat+';'+D.ll[1]+','+D.ll[0]+'?overview=full&geometries=geojson', 15000)
+    .then(function(j){
+      if(j.code !== 'Ok' || !j.routes || !j.routes.length) throw new Error('no route');
+      return j.routes[0];
+    });
+
+  road.then(function(r){
+    if(token !== routeToken) return;
+    paintDistance(site, {km:r.distance/1000, mins:driveMinutes(r.duration, origin.elev, D.alt)});
+  }, function(){
+    if(token !== routeToken) return;
+    paintDistance(site, {km:crow, straight:true});
+  });
+
+  Promise.all([ensureMap(), road.catch(function(){ return null; })]).then(function(res){
+    if(token !== routeToken) return;
+    var r = res[1], line;
+    routeLayer.clearLayers();
+    if(r){
+      line = r.geometry.coordinates.map(function(c){ return [c[1], c[0]]; });
+      L.polyline(line, {color:'#0b111c', weight:9, opacity:.7}).addTo(routeLayer);
+      L.polyline(line, {color:'#f4816a', weight:4.5, opacity:.95}).addTo(routeLayer);
+    } else {
+      line = [from, D.ll];
+      L.polyline(line, {color:'#f4816a', weight:3, opacity:.8, dashArray:'6 8'}).addTo(routeLayer);
+    }
+    L.marker(from, {icon:pinIcon('you', 'You'), keyboard:false}).addTo(routeLayer);
+    map.invalidateSize();
+    map.fitBounds(L.latLngBounds(line).extend(from).extend(D.ll), {padding:[48,48]});
+  }).catch(mapOffline);
+}
+
+function paintDistance(site, info){
+  var fromTxt = origin.label === 'your location' ? 'from your location' : 'from '+esc(origin.label);
+  var change = ' · <button type="button" class="linkish" data-act="change">change</button>';
+  var foot = '<div class="foot"><button type="button" class="btn-line" data-act="route">See the route</button></div>';
+  if(info.here){
+    rsumEl.innerHTML = '<p class="km">You are here</p><p class="from-txt">Your location is already in '+esc(site)+'.'+change+'</p>';
+    farEl.innerHTML = '<p class="lab">How far</p><p class="big">You are here</p>'+
+      '<p class="say">Your location is already in '+esc(site)+'. Enjoy it.</p>';
+    return;
+  }
+  if(info.straight){
+    rsumEl.innerHTML = '<p class="km">'+fmtKm(info.km)+'</p><p class="tm">in a straight line</p>'+
+      '<p class="from-txt">'+fromTxt+'. The road route could not be loaded, and the drive is longer than this.'+change+'</p>';
+    farEl.innerHTML = '<p class="lab">How far</p><p class="big">'+fmtKm(info.km)+'</p>'+
+      '<p class="say">In a straight line '+fromTxt+'. The road is longer.</p>'+foot;
+    return;
+  }
+  rsumEl.innerHTML = '<p class="km">'+fmtKm(info.km)+'</p><p class="tm">by road, '+fmtMinutes(info.mins)+' by car</p>'+
+    '<p class="from-txt">'+fromTxt+change+'</p>';
+  farEl.innerHTML = '<p class="lab">How far</p><p class="big">'+fmtKm(info.km)+'</p>'+
+    '<p class="say">'+fmtMinutes(info.mins).replace(/^a/,'A')+' by car '+fromTxt+'.</p>'+foot;
+}
+rsumEl.addEventListener('click', function(e){
+  if(!e.target.closest('[data-act="change"]')) return;
+  $('from').value = '';
+  $('from').focus();
+});
+
+function setOrigin(o){
+  origin = o;
+  save('shaant.origin', o);
+  if(current.site) drawRoute(current.site);
+}
+
+function locate(){
+  if(!navigator.geolocation){
+    status('This browser cannot share your location. Type your city instead.');
+    $('from').focus(); return;
+  }
+  status('Asking your browser for your location…');
+  navigator.geolocation.getCurrentPosition(function(p){
+    /* three decimals is about 100 m: plenty for a route, and no more precise than it needs to be */
+    var o = {lat:+p.coords.latitude.toFixed(3), lon:+p.coords.longitude.toFixed(3), label:'your location', elev:null};
+    /* the climb estimate wants your height; ask for it, and carry on without it if that fails */
+    fetchJSON('https://api.open-meteo.com/v1/elevation?latitude='+o.lat+'&longitude='+o.lon, 6000)
+      .then(function(j){ o.elev = j.elevation && j.elevation[0]; }, function(){})
+      .then(function(){ setOrigin(o); });
+  }, function(err){
+    status(err.code === 1 ? 'Location is blocked for this page. Type your city instead.'
+                          : 'Could not get your location. Type your city instead.');
+    $('from').focus();
+  }, {enableHighAccuracy:false, timeout:12000, maximumAge:600000});
+}
+$('locate').addEventListener('click', locate);
+
+$('from-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var q = $('from').value.trim();
+  if(!q) return;
+  status('Looking up '+esc(q)+'…');
+  fetchJSON('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=10&language=en&format=json')
+    .then(function(j){
+      var res = j.results || [];
+      var pick = res.filter(function(r){ return r.country_code === 'IN'; })[0] || res[0];
+      if(!pick){ status('Could not find “'+esc(q)+'”. Try the nearest big city.'); return; }
+      var label = pick.name;
+      if(pick.admin1 && pick.admin1.indexOf(pick.name) < 0) label += ', '+pick.admin1;
+      if(pick.country_code !== 'IN' && pick.country) label += ', '+pick.country;
+      setOrigin({lat:+pick.latitude.toFixed(3), lon:+pick.longitude.toFixed(3), label:label,
+                 elev:pick.elevation == null ? null : pick.elevation});
+    }, function(){ status('Could not look that up. Check your internet connection.'); });
+});
+
+/* ============================================================
+   5. Boot: open straight onto a place if the address names one
+   ============================================================ */
+function fromHash(){
+  var h = decodeURIComponent(location.hash.slice(1));
+  if(!h) return null;
+  var parts = h.split('/'), site = null;
+  NAMES.forEach(function(n){ if(slug(n) === parts[0]) site = n; });
+  if(!site) return null;
+  var d = parts[1] ? new Date(parts[1]+'T00:00:00') : null;
+  return {site:site, date:d && !isNaN(d) ? d : null};
+}
+function openFromHash(){
+  var r = fromHash();
+  if(!r) return;
+  if(r.date) dIn.value = iso(r.date);
+  var d = readDate();
+  if(r.site === current.site && current.date && iso(d) === iso(current.date)) return;
+  qIn.value = r.site;
+  msgEl.innerHTML = '';
+  show(r.site, d, {});
+}
+window.addEventListener('popstate', openFromHash);
+window.addEventListener('hashchange', openFromHash);
+openFromHash();
+
+})();
+</script>
+</body>
+</html>

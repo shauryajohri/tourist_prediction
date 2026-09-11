@@ -11,6 +11,14 @@ everything works: the scrolling mountain hero, the planner, all
 of it. Nothing to install. No Python. No terminal. It also works
 with no internet connection.
 
+For the quick version, double-click  place.html  instead.
+Type a place (spelling does not matter, "massori" finds Mussoorie)
+and one page shows, in order: how crowded it is, the weather,
+a price bar with hotels in the budget you pick, the places to see
+there, and a map of the drive from where you are.
+The crowd, hotels and places work offline. The live weather, the
+map and the route need an internet connection.
+
 
 HOW TO SHARE IT WITH SOMEONE
 ----------------------------
@@ -21,10 +29,14 @@ needs the assets folder next to it.
 
 WHAT IS IN THIS FOLDER
 ----------------------
-index.html        The entire website. One file.
+index.html        The full website, with the planner.
+place.html        The quick page: type a place, see everything.
 assets/data.js    Your model's answers, worked out in advance.
                   29 destinations, 853 dates, from 1 Sep 2026
                   to 31 Dec 2028.
+assets/places.js  The 29 destinations: places to see, map
+                  coordinates, and the hotel lists. Both pages
+                  read it, so a change here shows on both.
 READ-ME-FIRST.txt This file.
 
 
