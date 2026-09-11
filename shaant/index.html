@@ -3,43 +3,58 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Shaant. Type a place, see everything.</title>
-<meta name="description" content="Type a place in Uttarakhand. See how crowded it is, the weather, hotels in your budget, what to see there, and how far it is from you.">
-<meta name="theme-color" content="#101826">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101826'/%3E%3Cpath d='M4 22 L11 12 L15 17 L20 8 L28 22 Z' fill='%23f4816a'/%3E%3Cpath d='M4 25 h24' stroke='%237fd4d8' stroke-width='1.6' fill='none'/%3E%3C/svg%3E">
+<title>Shaant. Find the calm version of your trip.</title>
+<meta name="description" content="Type a place in Uttarakhand. See how crowded it will be, the weather, stays in your budget, what to see, and the drive from where you are.">
+<meta name="theme-color" content="#101a25">
+<meta property="og:title" content="Shaant. Find the calm version of your trip.">
+<meta property="og:description" content="Type a place in Uttarakhand. See how crowded it will be, the weather, stays in your budget, what to see, and the drive.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://shaant.netlify.app/">
+<meta property="og:image" content="https://shaant.netlify.app/assets/hero-ending.jpg">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1086">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101a25'/%3E%3Cpath d='M7 20 L16 9 L25 20 Z' fill='%23f0907a'/%3E%3Cpath d='M5 24.5 h22' stroke='%239cc8d8' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..700&family=Karla:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Eczar:wght@500;600&family=Hind:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /* ============================================================
-   SHAANT: type a place, see everything. The whole site is this one page.
+   SHAANT: find the calm version of your trip.
+   Palette sampled from the hero footage: slate cloud (#485876), pine
+   shadow (#1b2b39), lake silver, and the rose of first light on snow.
    ============================================================ */
 :root{
-  --canvas:#101826;
-  --canvas-deep:#0b111c;
-  --panel:#18222f;
-  --panel-hi:#1f2b3a;
-  --accent:#f4816a;
-  --accent-hover:#ff9b85;
-  --cool:#7fd4d8;
-  --warm:#f2c46d;
-  --text-primary:#eaf0f7;
-  --text-secondary:#93a4ba;
-  --text-dim:#6f8098;
-  --line:#2a3646;
-  --line-strong:#3d4d61;
+  --canvas:#101a25;
+  --canvas-deep:#0b131c;
+  --panel:#172331;
+  --panel-hi:#1f2d3d;
+  --line:#2a3848;
+  --line-strong:#3e4e62;
+  --accent:#f0907a;        /* the call to action and a very crowded day, nothing else */
+  --accent-hover:#ffa994;
+  --accent-muted:#5e3a35;
+  --lake:#9cc8d8;          /* still water: quiet days, focus, the lake line */
+  --cool:var(--lake);
+  --warm:#efc47a;          /* a normal day */
+  --mauve:#887284;         /* the rose band in the sky, used only as a glow */
+  --text-primary:#e9eff5;
+  --text-secondary:#98a8ba;
+  --text-dim:#71839a;
 
   /* stay cards are tinted by the kind of stay, never by price */
-  --t-a:#7fd4d8;   /* hotels and resorts */
-  --t-b:#f2c46d;   /* heritage and boutique */
-  --t-c:#9fd8a6;   /* homestays, guesthouses, hostels */
-  --t-d:#b9b0f0;   /* rest houses, ashrams, camps */
+  --t-a:#9cc8d8;
+  --t-b:#efc47a;
+  --t-c:#a3d6a8;
+  --t-d:#bdb3ee;
 
-  --display:'Archivo',system-ui,sans-serif;
-  --body:'Karla',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --display:'Eczar',Georgia,serif;
+  --body:'Hind',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
   --ease:cubic-bezier(.22,.61,.36,1);
-  --maxw:1080px;
+  --ease-soft:cubic-bezier(.4,0,.2,1);
+  --tshadow:0 1px 2px rgba(5,8,14,.95),0 3px 12px rgba(5,8,14,.78),0 10px 44px rgba(5,8,14,.8);
+  --maxw:1120px;
 }
 
 *{box-sizing:border-box}
@@ -47,11 +62,11 @@ html,body{overflow-x:hidden;overflow-x:clip}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--canvas);color:var(--text-primary);
   font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-h1,h2,h3,h4{font-family:var(--display);font-variation-settings:'wdth' 116;line-height:1.08;margin:0;letter-spacing:-.015em}
+h1,h2,h3,h4{font-family:var(--display);font-weight:600;line-height:1.1;margin:0;letter-spacing:-.01em}
 p{margin:0}
 a{color:inherit}
 button{font:inherit;color:inherit}
-svg{max-width:100%}
+img,svg{max-width:100%}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -59,43 +74,148 @@ svg{max-width:100%}
   padding:12px 20px;border-radius:0 0 10px 0;font-weight:600}
 .skip:focus{left:0}
 
-/* ---------- top bar ---------- */
-.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:18px;padding-bottom:10px}
-.brand{display:flex;align-items:baseline;gap:10px;font-family:var(--display);
-  font-variation-settings:'wdth' 122;font-weight:700;font-size:19px;letter-spacing:.01em;text-decoration:none}
-.brand i{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;flex:none;translate:0 -2px}
-.brand span{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--text-secondary);
-  letter-spacing:.14em;text-transform:uppercase}
+/* ---------- the one fixed environment layer: mist drift and grain ---------- */
+.env{position:fixed;inset:0;z-index:0;pointer-events:none}
+.env::before{content:"";position:absolute;inset:-20%;
+  background:
+    radial-gradient(55% 42% at 20% 14%,rgba(136,114,132,.13),transparent 64%),
+    radial-gradient(50% 40% at 84% 70%,rgba(156,200,216,.07),transparent 66%),
+    radial-gradient(80% 60% at 50% 110%,rgba(27,43,57,.6),transparent 70%);
+  animation:envdrift 92s var(--ease-soft) -24s infinite alternate}
+.env::after{content:"";position:absolute;inset:0;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
+@keyframes envdrift{from{transform:translate3d(-2.2%,-1.4%,0) scale(1.04)}to{transform:translate3d(2.4%,1.8%,0) scale(1.1)}}
 
-/* ---------- hero and search ---------- */
-.hero{position:relative;padding:9vh 0 8vh;text-align:center;transition:padding .6s var(--ease)}
-.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(60% 70% at 50% 0%,rgba(244,129,106,.10),transparent 70%),
-             radial-gradient(40% 50% at 85% 60%,rgba(127,212,216,.07),transparent 70%)}
-.hero>*{position:relative}
-.hero h1{font-size:clamp(34px,6.2vw,64px);font-variation-settings:'wdth' 120;font-weight:700;transition:font-size .6s var(--ease)}
-.hero .lede{margin:16px auto 0;max-width:50ch;color:var(--text-secondary);font-size:clamp(16px,2vw,19px)}
-.ridge{position:absolute;left:0;right:0;bottom:0;width:100%;height:70px;pointer-events:none}
-.ridge path{fill:none;stroke:var(--line);stroke-width:1.2}
-.ridge path:nth-child(2){stroke:rgba(244,129,106,.28)}
+/* ---------- nav ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;padding:14px 26px;
+  background:linear-gradient(to bottom,rgba(11,19,28,.82),rgba(11,19,28,0))}
+.brand{display:flex;align-items:baseline;gap:9px;text-decoration:none;
+  font-family:var(--display);font-weight:600;font-size:21px;letter-spacing:.005em;text-shadow:var(--tshadow)}
+.brand .dev{color:var(--accent);font-size:19px}
+.brand span.u{font-family:var(--mono);font-size:10.5px;font-weight:400;color:var(--text-secondary);
+  letter-spacing:.16em;text-transform:uppercase;text-shadow:none}
+.btn-sm{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#1a0d0a;
+  padding:9px 18px;border-radius:999px;font-weight:600;font-size:14.5px;white-space:nowrap;text-decoration:none;
+  transition:background .35s var(--ease),transform .35s var(--ease)}
+.btn-sm:hover{background:var(--accent-hover);transform:translateY(-1px)}
+@media (max-width:560px){
+  .nav{padding:11px 16px}
+  .brand span.u{display:none}
+  .btn-sm{padding:9px 14px;font-size:14px}
+}
 
-.hero.compact{padding:2vh 0 4vh}
-.hero.compact h1{font-size:clamp(24px,3.4vw,32px)}
-.hero.compact .lede,.hero.compact .popular{display:none}
+/* ============================================================
+   THE HERO: a 600vh pinned region. Scroll drives the video.
+   ============================================================ */
+.hero{position:relative;height:600vh;z-index:1}
+.plan-anchor{position:absolute;left:0;top:calc(100% - 100vh);width:1px;height:1px}
+.stage{position:sticky;top:0;height:100vh;overflow:hidden;background:var(--canvas-deep)}
+.poster{position:absolute;inset:0;background:var(--canvas-deep) center/cover no-repeat}
+#hero{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;
+  transition:opacity 1s var(--ease);will-change:transform;transform:translateZ(0)}
+.stage.video-ready #hero{opacity:1}
+.stage.video-failed #hero{display:none}
 
-.search{position:relative;display:grid;grid-template-columns:1fr 200px auto;gap:10px;max-width:780px;
-  margin:30px auto 0;padding:10px;text-align:left;background:var(--panel);
-  border:1px solid var(--line-strong);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-.hero.compact .search{margin-top:16px}
+/* legibility layer 1: the global base scrim, plus a top band under the nav */
+.scrim{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 120% 90% at 50% 45%,rgba(8,12,20,0) 35%,rgba(8,12,20,.58) 100%)}
+.scrim-t{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(11,19,28,.5) 0%,rgba(11,19,28,0) 22%,rgba(11,19,28,0) 70%,rgba(11,19,28,.55) 100%)}
+
+.ring{position:absolute;left:50%;bottom:40px;translate:-50% 0;width:44px;height:44px;
+  color:var(--text-secondary);opacity:0;transition:opacity .5s var(--ease);pointer-events:none}
+.ring.on{opacity:.85}
+.ring circle{transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .18s linear}
+.cue{position:absolute;left:50%;bottom:34px;translate:-50% 0;display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-secondary);
+  text-shadow:var(--tshadow);opacity:calc(1 - var(--hp,0)*9);pointer-events:none}
+.cue i{display:block;width:1px;height:34px;background:linear-gradient(var(--text-secondary),transparent);
+  animation:cue 2.6s var(--ease-soft) -.8s infinite}
+@keyframes cue{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}
+  51%{transform-origin:bottom}100%{transform:scaleY(.2);transform-origin:bottom}}
+
+/* ---------- caption bands ---------- */
+.bands{position:absolute;inset:0;pointer-events:none}
+.band{position:absolute;left:0;right:0;opacity:0;text-shadow:var(--tshadow)}
+/* legibility layer 2: a scrim per band that deepens only while its words are on */
+.band::before{content:"";position:absolute;inset:-8% -6%;pointer-events:none;opacity:calc(.25 + .75*var(--k,1));
+  background:radial-gradient(ellipse var(--sw,72%) 62% at var(--sx,30%) 50%,rgba(6,10,18,var(--sa,.64)) 0%,rgba(6,10,18,calc(var(--sa,.64)*.66)) 46%,rgba(6,10,18,0) 76%)}
+.band .in{position:relative}
+/* the glowing horizon is the action lane: bands 1 and 2 sit in the dark sky above it,
+   band 3 in the dark water below it (placed by the worst-frame audit) */
+.b1,.b2{top:clamp(78px,11.5vh,122px)}
+.b3{top:70%;translate:0 -50%}
+.b1 .in,.b3 .in{margin-left:7%;max-width:min(52%,660px)}
+.b1 .in{max-width:min(78%,1040px)}
+.b2 .in{margin-left:auto;margin-right:7%;max-width:min(78%,1040px);text-align:right}
+/* one line each, so the words stay in the dark sky and never reach the glowing peaks */
+.b1 .h,.b2 .h{font-size:clamp(30px,4.2vw,60px)}
+/* the one-line sky captions get a tall, wide scrim: the sky pales fast below the words,
+   so it reaches well past both ends of the line and down towards the peaks */
+.b1{--sx:38%;--sa:.72}
+.b2{--sx:62%;--sa:.72}
+.b1::before,.b2::before{inset:-150px -8% -120px;
+  background:radial-gradient(ellipse 72% 130% at var(--sx) 36%,rgba(6,10,18,var(--sa)) 0%,rgba(6,10,18,calc(var(--sa)*.8)) 46%,rgba(6,10,18,0) 100%)}
+.band.b2 .sub{max-width:60ch}
+.b3{--sa:.64}
+.band .kick{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lake);margin-bottom:16px}
+.band .kick .dev{font-family:var(--display);font-size:17px;letter-spacing:.02em;text-transform:none;color:var(--accent);margin-right:4px}
+.band .h{font-family:var(--display);font-weight:600;font-size:clamp(34px,5.4vw,76px);line-height:1.04;letter-spacing:-.015em}
+.b2 .h,.b2 .sub{margin-left:auto}
+.band .sub{margin-top:16px;font-size:clamp(17px,1.8vw,22px);color:#d6dee8;max-width:34ch;line-height:1.5}
+
+/* band 4, the settle: sits in the calm cloud above the peak */
+.b4{top:clamp(76px,11.5vh,120px);--sx:50%;--sa:.5}
+.b4::before{inset:-14% -4% -10%;background:radial-gradient(ellipse 60% 64% at 50% 44%,rgba(6,10,18,.55) 0%,rgba(6,10,18,.3) 50%,rgba(6,10,18,0) 78%)}
+.b4 .in{margin:0 auto;max-width:min(92%,820px);text-align:center}
+/* the brand already opened the journey in band one; the settle keeps the peak clear below it */
+.b4 .kick{display:none;margin-bottom:12px}
+.b4 .h{font-size:clamp(36px,4.6vw,64px)}
+.b4 .sub{margin:12px auto 0;max-width:56ch;font-size:clamp(16px,1.35vw,19px)}
+.b4.live .in{pointer-events:auto}
+@media (max-height:780px){
+  .b4 .h{font-size:clamp(32px,4vw,52px)}
+  .b4 .sub{font-size:16px;margin-top:8px}
+}
+
+/* word and character splitting */
+.w{display:inline-block;white-space:pre}
+.c{display:inline-block;will-change:transform,opacity}
+/* drift-down: the camera is sinking, so the words sink into place */
+.e-drift .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.8,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*-24px))}
+.e-drift .sub{opacity:clamp(0,(var(--k,0) - .45)*2.4,1)}
+/* scatter: cloud streaming past the lens */
+.e-scatter .c{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.6,1);opacity:var(--kc);
+  transform:translate(calc((1 - var(--kc))*var(--jx,0px)),calc((1 - var(--kc))*var(--jy,0px))) rotate(calc((1 - var(--kc))*var(--jr,0deg)))}
+.e-scatter .sub{opacity:clamp(0,(var(--k,0) - .5)*2.4,1)}
+/* blur-to-sharp: the fog clearing to show the lake. Static blur, opacity crossfade only. */
+.e-blur .stack{position:relative}
+.e-blur .soft{position:absolute;inset:0;filter:blur(11px);opacity:calc(1 - var(--k,0));pointer-events:none}
+.e-blur .sharp{opacity:var(--k,0)}
+.e-blur .sub{opacity:clamp(0,(var(--k,0) - .4)*2.2,1)}
+/* word-by-word rise into a staged settle: headline, then lede, then the search row */
+.e-rise .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.7,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*20px))}
+.e-rise .kick{opacity:clamp(0,var(--k,0)*3,1)}
+.b4 .sub{opacity:var(--ks,0);transform:translateY(calc((1 - var(--ks,0))*12px))}
+.b4 .cta{opacity:var(--kb,0);transform:translateY(calc((1 - var(--kb,0))*14px))}
+
+/* ---------- the search, living in the settle of the hero ---------- */
+.cta{margin-top:18px;text-shadow:none}
+/* z-index: the blur makes the form its own layer, and the suggestions must sit above the chips */
+.search{position:relative;z-index:5;display:grid;grid-template-columns:1fr 190px auto;gap:10px;max-width:760px;
+  margin:0 auto;padding:9px;text-align:left;
+  background:rgba(16,26,37,.66);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(156,200,216,.24);border-radius:20px;box-shadow:0 24px 60px rgba(4,8,14,.45)}
 .field{position:relative;display:flex;flex-direction:column;justify-content:center;
-  background:var(--canvas-deep);border:1px solid var(--line);border-radius:14px;padding:8px 14px 9px;
+  background:rgba(11,19,28,.62);border:1px solid var(--line);border-radius:14px;padding:7px 14px 8px;
   transition:border-color .3s var(--ease)}
-.field:focus-within{border-color:var(--cool)}
+.field:focus-within{border-color:var(--lake)}
 .field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-secondary)}
 .field input{width:100%;min-width:0;background:none;border:0;outline:0;padding:3px 0 0;
   color:var(--text-primary);font:500 19px/1.3 var(--body);color-scheme:dark}
-.field input::placeholder{color:#5d6d82}
-.go{min-height:58px;padding:0 26px;border:0;border-radius:14px;cursor:pointer;white-space:nowrap;
+.field input::placeholder{color:#6b7c91}
+.go{min-height:56px;padding:0 26px;border:0;border-radius:14px;cursor:pointer;white-space:nowrap;
   background:var(--accent);color:#1a0d0a;font-weight:600;font-size:17px;
   transition:background .3s var(--ease),transform .3s var(--ease)}
 .go:hover{background:var(--accent-hover);transform:translateY(-1px)}
@@ -105,67 +225,76 @@ svg{max-width:100%}
   .search .field.q{grid-column:1/-1}
   .go{padding:0 20px}
 }
-
 .suggest{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:30;list-style:none;margin:0;padding:6px;
   background:var(--panel-hi);border:1px solid var(--line-strong);border-radius:14px;
-  box-shadow:0 18px 50px rgba(0,0,0,.5);max-height:330px;overflow:auto}
-.suggest li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
-  padding:11px 12px;border-radius:10px;cursor:pointer}
-.suggest li[aria-selected="true"],.suggest li:hover{background:rgba(127,212,216,.1)}
+  box-shadow:0 18px 50px rgba(0,0,0,.5);max-height:300px;overflow:auto;text-shadow:none}
+.suggest li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 12px;border-radius:10px;cursor:pointer}
+.suggest li[aria-selected="true"],.suggest li:hover{background:rgba(156,200,216,.1)}
 .suggest .nm{font-weight:600}
 .suggest .kd{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--text-secondary);white-space:nowrap}
-
-.popular{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:18px}
-.popular>span{font-size:14px;color:var(--text-secondary);margin-right:4px}
-.chip{background:rgba(255,255,255,.045);border:1px solid var(--line-strong);border-radius:999px;
-  padding:7px 14px;font-size:14.5px;cursor:pointer;
+.popular{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:10px}
+.popular>span{font-size:14.5px;color:#d6dee8;margin-right:2px}
+.chip{background:rgba(16,26,37,.55);border:1px solid rgba(156,200,216,.26);border-radius:999px;
+  padding:6px 14px;font-size:14.5px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   transition:border-color .3s var(--ease),color .3s var(--ease),background .3s var(--ease)}
-.chip:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.08)}
+.chip:hover{border-color:var(--lake);color:var(--lake);background:rgba(156,200,216,.1)}
 @media (pointer:coarse){.chip{min-height:44px}}
-.msg{max-width:780px;margin:16px auto 0;font-size:15.5px;color:var(--text-secondary)}
+.msg{max-width:760px;margin:12px auto 0;font-size:15.5px;color:#d6dee8}
 .msg:empty{display:none}
 .msg b{color:var(--text-primary)}
-.msg .all{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:14px}
+.msg .all{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
 
-/* ---------- result head ---------- */
-.out{padding-bottom:30px}
-.head{padding:26px 0 24px;border-bottom:1px solid var(--line);margin-bottom:26px;scroll-margin-top:12px}
-.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool)}
-.head h2{font-size:clamp(42px,7vw,76px);font-variation-settings:'wdth' 122;font-weight:700;margin-top:10px}
-.head .when{margin-top:8px;color:var(--text-secondary);font-size:17px}
+/* ============================================================
+   MAIN: results, then the sections
+   ============================================================ */
+/* see-through, so the one fixed mist layer runs behind every section */
+main{position:relative;z-index:2;background:transparent}
+/* top and bottom only: .wrap owns the side padding */
+.out{padding-top:30px;padding-bottom:40px}
+.head{padding:70px 0 24px;border-bottom:1px solid var(--line);margin-bottom:26px;scroll-margin-top:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--lake)}
+.head h2{font-size:clamp(44px,7vw,80px);margin-top:10px;line-height:1}
+.head .when{margin-top:10px;color:var(--text-secondary);font-size:17px}
+.again{margin-top:14px;display:inline-flex}
 
-/* ---------- at a glance ---------- */
+/* at a glance */
 .glance{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 @media (max-width:920px){.glance{grid-template-columns:1fr 1fr}.glance .far{grid-column:1/-1}}
 @media (max-width:600px){.glance{grid-template-columns:1fr}}
 .g{position:relative;display:flex;flex-direction:column;gap:8px;min-height:250px;overflow:hidden;
   background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 22px 20px}
-.g::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--tone,var(--line-strong))}
+.g::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--tone,var(--line-strong))}
 .g .lab{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-secondary)}
-.g .big{font-family:var(--display);font-variation-settings:'wdth' 118;font-weight:700;
-  font-size:clamp(32px,3.8vw,42px);line-height:1.05;color:var(--tone,var(--text-primary))}
+.g .big{font-family:var(--display);font-weight:600;font-size:clamp(32px,3.6vw,42px);line-height:1.05;color:var(--tone,var(--text-primary))}
 .g .big .lo{font-size:.62em;font-weight:500;color:var(--text-secondary)}
-.g .say{font-size:16px;line-height:1.5;color:#c6d0dd}
+.g .say{font-size:16px;line-height:1.5;color:#c9d3df}
 .g .small{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
 .g .foot{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .g .src{font-size:12.5px;color:var(--text-dim);line-height:1.45}
-
-.crowd.quiet{--tone:var(--cool)}
+.crowd.quiet{--tone:var(--lake)}
 .crowd.steady{--tone:var(--warm)}
 .crowd.busy{--tone:var(--accent)}
-.people{display:flex;gap:2px;margin-top:2px}
-.people svg{width:30px;height:30px;color:var(--line-strong)}
-.people svg.on{color:var(--tone)}
-
 .weather{--tone:#b9c7d8}
 .wrow{display:flex;align-items:center;gap:14px}
 .wrow>svg{width:52px;height:52px;flex:none;color:var(--tone)}
-.far{--tone:var(--cool)}
+.far{--tone:var(--lake)}
+
+/* the signature: the lake line. Flat water on a calm day, choppy on a crowded one. */
+.people{display:flex;gap:2px;margin-top:2px}
+.people svg{width:30px;height:30px;color:var(--line-strong)}
+.people svg.on{color:var(--tone)}
+.lake{display:block;width:100%;height:34px;overflow:hidden}
+/* max-width none: the line is drawn twice as wide as its box so it can drift and loop */
+.lake svg{display:block;width:200%;max-width:none;height:100%}
+.lake path{fill:none;stroke:var(--tone,var(--lake));stroke-width:1.6;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.lake path+path{stroke-opacity:.35}
+.lake svg{animation:lakedrift var(--dur,12s) linear -3s infinite}
+@keyframes lakedrift{to{transform:translateX(-50%)}}
 
 .btn-line{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);background:transparent;
   border-radius:999px;padding:9px 16px;font-size:14.5px;cursor:pointer;text-decoration:none;
   transition:border-color .3s var(--ease),color .3s var(--ease),background .3s var(--ease)}
-.btn-line:hover{border-color:var(--cool);color:var(--cool);background:rgba(127,212,216,.07)}
+.btn-line:hover{border-color:var(--lake);color:var(--lake);background:rgba(156,200,216,.07)}
 .btn-line svg{width:16px;height:16px}
 @media (pointer:coarse){.btn-line{min-height:44px}}
 .skel{display:inline-block;height:.9em;width:7ch;border-radius:6px;vertical-align:middle;
@@ -174,47 +303,42 @@ svg{max-width:100%}
 @keyframes shimmer{to{background-position:-200% 0}}
 .fine{font-size:13.5px;color:var(--text-dim);margin-top:14px;line-height:1.5}
 
-/* ---------- sections ---------- */
-.block{margin-top:70px;scroll-margin-top:20px}
-.step{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool);margin-bottom:10px}
-.block h3{font-size:clamp(26px,3.4vw,36px);font-variation-settings:'wdth' 116}
-.block .sub{margin-top:8px;color:var(--text-secondary);font-size:16.5px;max-width:60ch}
+.block{margin-top:70px;scroll-margin-top:70px}
+.step{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--lake);margin-bottom:10px}
+.block h3{font-size:clamp(28px,3.4vw,38px)}
 .note{font-size:13.5px;color:var(--text-secondary);margin-top:16px;line-height:1.5;max-width:80ch}
 
 /* ---------- budget bar: drag it, or type the number ---------- */
-.budget{margin-top:22px;padding:22px 24px 16px;background:var(--canvas-deep);
-  border:1px solid var(--line-strong);border-radius:18px}
+.budget{margin-top:22px;padding:22px 24px 16px;background:var(--canvas-deep);border:1px solid var(--line-strong);border-radius:18px}
 .b-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px}
-.b-top label{font-size:16px;color:#c6d0dd}
+.b-top label{font-size:16px;color:#c9d3df}
 .b-input{display:flex;align-items:baseline;gap:6px;padding:6px 14px 7px;background:var(--panel);
   border:1px solid var(--line-strong);border-radius:12px;transition:border-color .3s var(--ease)}
-.b-input:focus-within{border-color:var(--cool)}
+.b-input:focus-within{border-color:var(--lake)}
 .b-input span{font-family:var(--display);font-weight:600;font-size:24px;color:var(--text-secondary)}
-.b-input input{width:7ch;min-width:0;background:none;border:0;outline:0;padding:0;color:var(--text-primary);
-  font:700 26px/1.2 var(--display);font-variation-settings:'wdth' 112}
+.b-input input{width:7ch;min-width:0;background:none;border:0;outline:0;padding:0;color:var(--text-primary);font:600 26px/1.2 var(--display)}
 .b-input small{font-size:14px;color:var(--text-secondary);white-space:nowrap}
 .b-fit{margin-left:auto;font-size:15px;color:var(--text-secondary)}
-.b-fit b{color:var(--cool);font-weight:600}
+.b-fit b{color:var(--lake);font-weight:600}
 @media (max-width:600px){.b-fit{margin-left:0;flex-basis:100%}}
 /* the thumb is 24 px wide, so marks and labels sit on the 12 px-inset track it actually travels */
 .b-slider{position:relative;height:40px;margin-top:20px}
 .b-marks{position:absolute;left:0;right:0;top:0;height:12px;pointer-events:none}
 .b-marks i{position:absolute;top:0;width:3px;height:12px;margin-left:-1.5px;border-radius:2px;
   left:calc(12px + (100% - 24px)*var(--p));background:var(--line-strong);transition:background .3s var(--ease)}
-.b-marks i.in{background:var(--cool)}
+.b-marks i.in{background:var(--lake)}
 .b-range{-webkit-appearance:none;appearance:none;position:absolute;left:0;right:0;bottom:0;width:100%;height:24px;
   margin:0;background:transparent;cursor:pointer;touch-action:pan-y}
 .b-range::-webkit-slider-runnable-track{height:8px;border-radius:999px;
-  background:linear-gradient(to right,var(--cool) 0 var(--fill,50%),var(--line-strong) var(--fill,50%) 100%)}
+  background:linear-gradient(to right,var(--lake) 0 var(--fill,50%),var(--line-strong) var(--fill,50%) 100%)}
 .b-range::-moz-range-track{height:8px;border-radius:999px;background:var(--line-strong)}
-.b-range::-moz-range-progress{height:8px;border-radius:999px;background:var(--cool)}
+.b-range::-moz-range-progress{height:8px;border-radius:999px;background:var(--lake)}
 .b-range::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-8px;border-radius:50%;
-  background:#fff;border:4px solid var(--cool);box-shadow:0 0 0 6px rgba(127,212,216,.18);transition:box-shadow .2s}
-.b-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--cool);
-  box-shadow:0 0 0 6px rgba(127,212,216,.18)}
+  background:#fff;border:4px solid var(--lake);box-shadow:0 0 0 6px rgba(156,200,216,.18);transition:box-shadow .2s}
+.b-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid var(--lake);box-shadow:0 0 0 6px rgba(156,200,216,.18)}
 .b-range:focus-visible{outline:none}
-.b-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 9px rgba(127,212,216,.4)}
-.b-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 9px rgba(127,212,216,.4)}
+.b-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 9px rgba(156,200,216,.4)}
+.b-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 9px rgba(156,200,216,.4)}
 .b-scale{position:relative;height:18px;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--text-dim)}
 .b-scale span{position:absolute;top:0;left:calc(12px + (100% - 24px)*var(--p));transform:translateX(-50%);white-space:nowrap}
 .b-scale span:first-child{transform:translateX(-12px)}
@@ -233,18 +357,15 @@ svg{max-width:100%}
 @media (max-width:900px){.track{grid-auto-columns:calc((100% - 16px)/2)}}
 @media (max-width:600px){.track{grid-auto-columns:84%}}
 .car-btn{position:absolute;top:50%;z-index:3;display:grid;place-items:center;width:46px;height:46px;margin-top:-23px;
-  border-radius:50%;cursor:pointer;background:var(--panel-hi);color:var(--text-primary);
-  border:1px solid var(--line-strong);box-shadow:0 8px 24px rgba(0,0,0,.45);
-  transition:background .3s var(--ease),color .3s var(--ease),transform .2s var(--ease)}
-.car-btn:hover{background:var(--line-strong);color:var(--cool)}
+  border-radius:50%;cursor:pointer;background:var(--panel-hi);color:var(--text-primary);border:1px solid var(--line-strong);
+  box-shadow:0 8px 24px rgba(0,0,0,.45);transition:background .3s var(--ease),color .3s var(--ease),transform .2s var(--ease)}
+.car-btn:hover{background:var(--line-strong);color:var(--lake)}
 .car-btn:active{transform:scale(.92)}
 .car-btn svg{width:20px;height:20px}
-/* arrows never sit on a card: out in the page margin when there is one, beside a narrowed
-   row when there is not, and under the row on a phone */
 .car-btn.prev{left:-66px}
 .car-btn.next{right:-66px}
 .car-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px;min-height:18px}
-@media (max-width:1219px){
+@media (max-width:1259px){
   .car-view{padding:0 34px}
   .car-btn.prev{left:-14px}
   .car-btn.next{right:-14px}
@@ -261,25 +382,18 @@ svg{max-width:100%}
 .car-count{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--text-secondary)}
 .car-dots{display:flex;gap:6px}
 .car-dots span{width:7px;height:7px;border-radius:50%;background:var(--line-strong);transition:background .3s var(--ease)}
-.car-dots span.on{background:var(--cool)}
+.car-dots span.on{background:var(--lake)}
 .carousel.static .car-btn,.carousel.static .car-dots{display:none}
-/* the rotation: cards ease in at one edge and out at the other as the row moves */
 @supports (animation-timeline: view()){
   @media (prefers-reduced-motion:no-preference){
     .track>.slot>*{animation:car-edge linear both;animation-timeline:view(inline)}
   }
 }
-@keyframes car-edge{
-  0%{opacity:.25;transform:scale(.9)}
-  20%,80%{opacity:1;transform:none}
-  100%{opacity:.25;transform:scale(.9)}
-}
+@keyframes car-edge{0%{opacity:.25;transform:scale(.9)}20%,80%{opacity:1;transform:none}100%{opacity:.25;transform:scale(.9)}}
 
 /* ---------- stay cards ---------- */
-.stay{display:flex;flex-direction:column;overflow:hidden;background:var(--panel);
-  border:1px solid var(--line);border-radius:18px;
+.stay{display:flex;flex-direction:column;overflow:hidden;background:var(--panel);border:1px solid var(--line);border-radius:18px;
   transition:translate .4s var(--ease),border-color .4s var(--ease)}
-/* translate, not transform: the carousel animates transform on these cards */
 .stay:hover{translate:0 -3px;border-color:var(--line-strong)}
 .stay[data-g="a"]{--tc:var(--t-a)}
 .stay[data-g="b"]{--tc:var(--t-b)}
@@ -288,16 +402,16 @@ svg{max-width:100%}
 .stay .art{position:relative;height:96px;display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:0 18px;overflow:hidden;border-bottom:1px solid var(--line);
   background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.01));
-  background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 24%,transparent),color-mix(in srgb,var(--tc) 3%,transparent))}
-/* the contour motif, carried onto every card */
-.stay .art::after{content:"";position:absolute;right:-20px;bottom:-16px;width:180px;height:90px;pointer-events:none;opacity:.55;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='90'%3E%3Cg fill='none' stroke='%23eaf0f7' stroke-opacity='.18' stroke-width='1'%3E%3Cpath d='M0 40 C40 24 76 52 112 40 142 30 164 44 180 36'/%3E%3Cpath d='M0 58 C42 42 78 70 114 58 144 48 166 62 180 54'/%3E%3Cpath d='M0 76 C44 60 80 88 116 76 146 66 168 80 180 72'/%3E%3C/g%3E%3C/svg%3E")}
+  background:linear-gradient(135deg,color-mix(in srgb,var(--tc) 22%,transparent),color-mix(in srgb,var(--tc) 3%,transparent))}
+/* the lake line, carried onto every card as faint still water */
+.stay .art::after{content:"";position:absolute;left:0;right:0;bottom:10px;height:30px;pointer-events:none;opacity:.6;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='30'%3E%3Cg fill='none' stroke='%23e9eff5' stroke-opacity='.2' stroke-width='1'%3E%3Cpath d='M0 8 C30 6 60 10 90 8 S150 6 180 8 210 10 240 8'/%3E%3Cpath d='M0 17 C30 15 60 19 90 17 S150 15 180 17 210 19 240 17'/%3E%3Cpath d='M0 26 C30 24 60 28 90 26 S150 24 180 26 210 28 240 26'/%3E%3C/g%3E%3C/svg%3E") repeat-x}
 .stay .art>*{position:relative;z-index:1}
 .stay .art .ic{width:42px;height:42px;color:var(--tc)}
 .stay .ty{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-align:right;line-height:1.5}
 .stay .ty em{display:block;font-style:normal;letter-spacing:.04em;text-transform:none;color:var(--text-secondary);font-family:var(--body);font-size:12.5px}
-.stay .body{display:flex;flex-direction:column;gap:7px;flex:1;padding:16px 18px 16px}
-.stay h4{font-size:18px;font-variation-settings:'wdth' 110;line-height:1.25}
+.stay .body{display:flex;flex-direction:column;gap:7px;flex:1;padding:16px 18px}
+.stay h4{font-size:19px;line-height:1.25}
 .stay .price{font-family:var(--display);font-weight:600;font-size:17px;color:var(--tc)}
 .stay .price small{font-family:var(--body);font-weight:400;font-size:13.5px;color:var(--text-secondary)}
 .stay .d{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
@@ -313,208 +427,435 @@ svg{max-width:100%}
 .empty .chip{margin-top:12px}
 
 /* ---------- places to see ---------- */
-.spot{display:flex;flex-direction:column;gap:8px;background:var(--canvas-deep);border:1px solid var(--line);
-  border-radius:16px;padding:18px 18px 12px;
+.spot{display:flex;flex-direction:column;gap:8px;background:var(--canvas-deep);border:1px solid var(--line);border-radius:16px;padding:18px 18px 12px;
   transition:border-color .4s var(--ease),translate .4s var(--ease),background .4s var(--ease)}
 .spot:hover{border-color:var(--line-strong);translate:0 -3px;background:var(--panel)}
 .spot .row{display:flex;align-items:center;gap:12px}
-.spot .ic{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;color:var(--cool);
-  background:rgba(127,212,216,.08);border:1px solid rgba(127,212,216,.2)}
+.spot .ic{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:12px;color:var(--lake);
+  background:rgba(156,200,216,.08);border:1px solid rgba(156,200,216,.2)}
 .spot .ic svg{width:22px;height:22px}
-.spot h4{font-size:16.5px;line-height:1.25;font-variation-settings:'wdth' 110}
-.spot .km{display:block;margin-top:3px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--cool)}
+.spot h4{font-size:17.5px;line-height:1.25}
+.spot .km{display:block;margin-top:3px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--lake)}
 .spot .km.here{color:var(--text-secondary)}
 .spot p{font-size:14.5px;line-height:1.5;color:var(--text-secondary)}
 .spot .links{padding-top:4px}
 
 /* ---------- route ---------- */
 .route-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:22px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 22px;
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 24px;
   border:0;border-radius:999px;cursor:pointer;background:var(--accent);color:#1a0d0a;font-weight:600;font-size:16px;
-  text-decoration:none;transition:background .3s var(--ease),transform .3s var(--ease)}
-.btn:hover{background:var(--accent-hover);transform:translateY(-1px)}
+  text-decoration:none;box-shadow:0 6px 26px rgba(240,144,122,.2);
+  transition:background .3s var(--ease),transform .3s var(--ease),box-shadow .3s var(--ease)}
+.btn:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 10px 32px rgba(240,144,122,.28)}
 .btn svg{width:18px;height:18px}
-.btn.ghost{background:transparent;color:var(--text-primary);border:1px solid var(--line-strong)}
+.btn.ghost{background:transparent;color:var(--text-primary);border:1px solid var(--line-strong);box-shadow:none}
 .btn.ghost:hover{background:rgba(255,255,255,.05);border-color:var(--text-secondary)}
 .or{font-size:14px;color:var(--text-secondary)}
 .from{display:flex;flex:1;min-width:250px;max-width:440px;padding:4px 4px 4px 18px;
   background:var(--canvas-deep);border:1px solid var(--line-strong);border-radius:999px;transition:border-color .3s var(--ease)}
-.from:focus-within{border-color:var(--cool)}
+.from:focus-within{border-color:var(--lake)}
 .from input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text-primary);font:16px var(--body)}
-.from input::placeholder{color:#5d6d82}
+.from input::placeholder{color:#6b7c91}
 .from button{border:0;border-radius:999px;padding:0 18px;min-height:40px;cursor:pointer;background:var(--panel-hi);font-weight:600;
   transition:background .3s var(--ease)}
 .from button:hover{background:var(--line-strong)}
 .rsum{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 22px;margin-top:22px;min-height:20px}
-.rsum .km{font-family:var(--display);font-variation-settings:'wdth' 120;font-weight:700;font-size:clamp(38px,5vw,56px);line-height:1}
-.rsum .tm{font-size:19px;color:#c6d0dd}
+.rsum .km{font-family:var(--display);font-weight:600;font-size:clamp(40px,5vw,58px);line-height:1}
+.rsum .tm{font-size:19px;color:#c9d3df}
 .rsum .from-txt{flex-basis:100%;font-size:15px;color:var(--text-secondary)}
 .rsum .status{font-size:15.5px;color:var(--text-secondary)}
-.linkish{background:none;border:0;padding:0;color:var(--cool);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.go-note{margin-top:14px;display:flex;gap:10px;align-items:flex-start;font-size:15px;color:#c6d0dd;
-  background:rgba(127,212,216,.055);border:1px solid rgba(127,212,216,.2);border-radius:12px;padding:13px 15px}
-.go-note svg{flex:none;width:18px;height:18px;margin-top:2px;color:var(--cool)}
+.linkish{background:none;border:0;padding:0;color:var(--lake);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.go-note{margin-top:14px;display:flex;gap:10px;align-items:flex-start;font-size:15px;color:#c9d3df;
+  background:rgba(156,200,216,.055);border:1px solid rgba(156,200,216,.2);border-radius:12px;padding:13px 15px}
+.go-note svg{flex:none;width:18px;height:18px;margin-top:2px;color:var(--lake)}
 .go-note[hidden]{display:none}
 .map{position:relative;height:min(62vh,470px);margin-top:18px;overflow:hidden;
   background:var(--canvas-deep);border:1px solid var(--line-strong);border-radius:18px}
 .map-off{display:grid;place-items:center;height:100%;padding:24px;text-align:center;color:var(--text-secondary)}
 .route-foot{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:16px}
 .route-foot .note{margin-top:0;flex:1;min-width:240px}
-
-/* Leaflet, dressed for the dark canvas. Scoped to #map because leaflet.css is loaded
-   later, on demand, and would win a tie on specificity. */
 #map.leaflet-container{background:var(--canvas-deep);font-family:var(--body)}
 #map .leaflet-bar{border:1px solid var(--line-strong)}
 #map .leaflet-bar a{background:var(--panel-hi);color:var(--text-primary);border-bottom-color:var(--line-strong)}
 #map .leaflet-bar a:hover,#map .leaflet-bar a:focus{background:var(--line-strong);color:var(--text-primary)}
-#map .leaflet-control-attribution{background:rgba(11,17,28,.82);color:var(--text-secondary);font-size:10.5px;line-height:1.5;padding:1px 7px}
+#map .leaflet-control-attribution{background:rgba(11,19,28,.82);color:var(--text-secondary);font-size:10.5px;line-height:1.5;padding:1px 7px}
 #map .leaflet-control-attribution a{color:#b9c7d8}
-.pin i{display:block;width:20px;height:20px;border-radius:50%;border:3px solid #fff;
-  background:var(--accent);box-shadow:0 0 0 7px rgba(244,129,106,.28)}
-.pin.you i{background:var(--cool);box-shadow:0 0 0 7px rgba(127,212,216,.28)}
+.pin i{display:block;width:20px;height:20px;border-radius:50%;border:3px solid #fff;background:var(--accent);box-shadow:0 0 0 7px rgba(240,144,122,.28)}
+.pin.you i{background:var(--lake);box-shadow:0 0 0 7px rgba(156,200,216,.28)}
 .pin b{position:absolute;left:28px;top:-1px;white-space:nowrap;padding:4px 9px;border-radius:8px;
-  font:600 13px/1.2 var(--body);color:#fff;background:rgba(11,17,28,.88);border:1px solid var(--line-strong)}
+  font:600 13px/1.2 var(--body);color:#fff;background:rgba(11,19,28,.88);border:1px solid var(--line-strong)}
+
+/* ============================================================
+   THE SECTIONS
+   ============================================================ */
+.sec{position:relative;padding:110px 0;scroll-margin-top:60px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lake);margin-bottom:16px}
+.h2{font-size:clamp(32px,4.4vw,54px);line-height:1.08}
+.lede{font-size:clamp(17px,1.8vw,20px);color:var(--text-secondary);line-height:1.6}
+
+/* the lake line as a divider: draws itself across the page, then lies flat */
+.shore{display:block;width:100%;height:40px;overflow:visible}
+.shore path{fill:none;stroke:var(--line-strong);stroke-width:1.2;stroke-linecap:round;
+  stroke-dasharray:var(--len,1500);stroke-dashoffset:var(--len,1500);transition:stroke-dashoffset 2.2s var(--ease)}
+.shore path+path{stroke:rgba(156,200,216,.35);transition-delay:.18s}
+.shore.in path{stroke-dashoffset:0}
+
+/* entrances, sequenced; the stagger is retired afterwards so hovers never lag */
+.rise{opacity:0;transform:translateY(24px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rise.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(22px);transition:opacity .85s var(--ease),transform .85s var(--ease),translate .4s var(--ease),border-color .4s var(--ease)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(1){transition-delay:.05s}
+.stagger.in>*:nth-child(2){transition-delay:.17s}
+.stagger.in>*:nth-child(3){transition-delay:.29s}
+.stagger.in>*:nth-child(4){transition-delay:.41s}
+.stagger.done>*:nth-child(1),.stagger.done>*:nth-child(2),.stagger.done>*:nth-child(3),
+.stagger.done>*:nth-child(4),.stagger.done>*{transition-delay:0s !important}
+
+/* whisper-level mist motes, paused whenever their section is off screen */
+.motes{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.motes i{position:absolute;width:calc(var(--s,90px)*2.8);height:calc(var(--s,90px)*1.6);border-radius:50%;
+  left:var(--x);top:var(--y);translate:-50% -50%;background:radial-gradient(closest-side,rgba(210,222,236,.055),transparent);
+  animation:mote var(--d,26s) var(--ease-soft) var(--dl,-6s) infinite alternate;animation-play-state:paused}
+.motes.on i{animation-play-state:running}
+@keyframes mote{from{transform:translate3d(-30px,10px,0)}to{transform:translate3d(40px,-24px,0)}}
+
+/* ---------- 1. how to read it: centred head, three waters ---------- */
+#calm .head-c{text-align:center;max-width:760px;margin:0 auto}
+#calm .h2{margin:0 auto;max-width:22ch}
+.waters{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:52px}
+@media (max-width:860px){.waters{grid-template-columns:1fr}}
+.water{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:28px 26px 26px;
+  display:flex;flex-direction:column;gap:12px}
+.water.quiet{--tone:var(--lake)}
+.water.steady{--tone:var(--warm)}
+.water.busy{--tone:var(--accent)}
+.water .lake{height:46px;margin:2px 0 6px}
+.water h3{font-size:26px;color:var(--tone)}
+.water p{color:#c9d3df;font-size:16px}
+#calm .note{margin:30px auto 0;text-align:center;font-size:15px;color:var(--text-secondary)}
+
+/* ---------- 2. the other way: split head, image-led cards ---------- */
+#twins .head-s{display:grid;grid-template-columns:1.1fr 1fr;gap:18px 60px;align-items:end}
+@media (max-width:860px){#twins .head-s{grid-template-columns:1fr}}
+.twins{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+@media (max-width:900px){.twins{grid-template-columns:1fr}}
+.twin{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:440px;overflow:hidden;
+  border-radius:22px;border:1px solid var(--line);isolation:isolate;
+  transition:translate .45s var(--ease),border-color .45s var(--ease)}
+.twin:hover{translate:0 -4px;border-color:var(--line-strong)}
+.twin img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;transition:transform 1.2s var(--ease)}
+.twin:hover img{transform:scale(1.04)}
+.twin::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to bottom,rgba(11,19,28,0) 30%,rgba(11,19,28,.78) 64%,rgba(11,19,28,.94) 100%)}
+.twin .t{padding:24px 24px 22px}
+.twin .alt{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--lake)}
+.twin h3{font-size:30px;margin-top:6px}
+.twin p{margin-top:8px;color:#d0d9e4;font-size:15.5px;line-height:1.55}
+.twin .btn-line{margin-top:16px;background:rgba(11,19,28,.5)}
+@media (max-width:900px){.twin{min-height:380px}}
+
+/* ---------- 3. good to know: sticky title, open-and-close answers ---------- */
+.faq-grid{display:grid;grid-template-columns:.8fr 1.4fr;gap:40px 70px;align-items:start}
+@media (max-width:860px){.faq-grid{grid-template-columns:1fr}}
+.faq-title{position:sticky;top:96px}
+@media (max-width:860px){.faq-title{position:static}}
+.qa{border-top:1px solid var(--line)}
+.qa:last-child{border-bottom:1px solid var(--line)}
+.qa summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:baseline;gap:18px;
+  padding:22px 2px;font-family:var(--display);font-weight:500;font-size:clamp(19px,2vw,23px);line-height:1.3}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary i{flex:none;position:relative;width:14px;height:14px;translate:0 1px}
+.qa summary i::before,.qa summary i::after{content:"";position:absolute;left:0;right:0;top:6px;height:2px;border-radius:2px;
+  background:var(--lake);transition:transform .4s var(--ease)}
+.qa summary i::after{transform:rotate(90deg)}
+.qa[open] summary i::after{transform:rotate(0)}
+.qa summary:hover{color:var(--lake)}
+.qa p{padding:0 2px 24px;color:var(--text-secondary);max-width:62ch}
+
+/* ---------- 4. the close, over the ending frame ---------- */
+#go{padding:0;overflow:hidden}
+/* the ending frame fades in from nothing at the top, so the page's mist flows straight into it */
+#go .bg{position:absolute;inset:0;background:transparent 50% 62%/cover no-repeat;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34%);mask-image:linear-gradient(to bottom,transparent 0,#000 34%)}
+#go .bg.on{background-image:url('assets/hero-ending.jpg')}
+#go::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(16,26,37,0) 0%,rgba(16,26,37,.3) 30%,rgba(11,19,28,.2) 60%,rgba(11,19,28,.7) 100%)}
+#go .wrap{position:relative;z-index:2;text-align:center;padding-top:150px;padding-bottom:230px;text-shadow:var(--tshadow)}
+#go .h2{margin:0 auto}
+#go .h2 .l{display:block}
+#go .lede{margin:18px auto 0;color:#d6dee8}
+#go .btn{margin-top:32px;text-shadow:none}
 
 /* ---------- footer ---------- */
-footer{margin-top:70px;border-top:1px solid var(--line);background:var(--canvas-deep);padding:40px 0 50px}
+footer{position:relative;z-index:2;background:var(--canvas-deep);border-top:1px solid var(--line);padding:46px 0 56px}
 footer p{font-size:14.5px;color:var(--text-secondary);max-width:80ch;line-height:1.6}
 footer p+p{margin-top:8px}
 footer .fine{margin-top:8px}
+footer .brand{font-size:19px;margin-bottom:12px;text-shadow:none}
 
+@media (pointer:coarse){.btn,.btn-sm,.go{min-height:44px;display:inline-flex;align-items:center;justify-content:center}}
+
+/* ---------- the five static-hero gates (identical strings in the script) ---------- */
+@media (max-width: 720px),
+       (orientation: portrait) and (max-width: 1024px),
+       (orientation: portrait) and (pointer: coarse),
+       (orientation: landscape) and (pointer: coarse) and (max-height: 560px),
+       (prefers-reduced-motion: reduce){
+  .hero{height:auto}
+  .plan-anchor{top:0}
+  .stage{position:relative;height:auto;min-height:100vh;min-height:100svh;
+    background:var(--canvas-deep) url('assets/hero-ending.jpg') 50% 100%/cover no-repeat}
+  .poster,#hero,.ring,.cue,.b1,.b2,.b3{display:none}
+  .bands{position:relative;inset:auto;pointer-events:auto;padding:92px 0 38vh}
+  .b4{position:relative;top:auto;opacity:1 !important;--k:1 !important;--ks:1 !important;--kb:1 !important}
+  .b4 .in{pointer-events:auto;max-width:min(100% - 32px,820px)}
+  .b4 .kick{display:block}
+  .b4 .h{font-size:clamp(36px,9vw,56px)}
+}
+/* short desktop windows keep the scrub but drop the small overlays */
+@media (max-height:560px){.ring,.cue{display:none}}
+
+/* ---------- reduced motion, honoured completely ---------- */
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  *,*::before,*::after{animation:none !important;transition:none !important}
+  *,*::before,*::after{animation:none !important;transition:none !important;transition-delay:0s !important}
+  .rise,.stagger>*{opacity:1 !important;transform:none !important}
+  .shore path{stroke-dashoffset:0 !important}
 }
+body.pinned .rise,body.pinned .stagger>*{opacity:1;transform:none}
+body.pinned .shore path{stroke-dashoffset:0}
+body.paused *,body.paused *::before,body.paused *::after{animation-play-state:paused !important}
 </style>
 </head>
 <body>
-
 <a class="skip" href="#q">Skip to the search</a>
+<div class="env" aria-hidden="true"></div>
 
-<header class="top">
-  <div class="wrap">
-    <a class="brand" href="index.html"><i aria-hidden="true"></i>Shaant<span>Uttarakhand</span></a>
+<nav class="nav" aria-label="Main">
+  <a class="brand" href="#top"><span class="dev" lang="hi">शांत</span>Shaant<span class="u">Uttarakhand</span></a>
+  <a class="btn-sm" href="#plan">Plan a trip</a>
+</nav>
+<div id="top"></div>
+
+<!-- ===================== THE SCROLL HERO ===================== -->
+<header class="hero" id="hero-region">
+  <span class="plan-anchor" id="plan" aria-hidden="true"></span>
+  <div class="stage" id="stage">
+    <div class="poster" id="poster" aria-hidden="true"></div>
+    <video id="hero" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="scrim-t" aria-hidden="true"></div>
+    <svg class="ring" id="ring" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/>
+    </svg>
+    <p class="cue" id="cue" aria-hidden="true">Scroll<i></i></p>
+
+    <div class="bands" id="bands">
+      <div class="band b1 e-drift" data-a="0" data-b="0.22">
+        <div class="in">
+          <p class="kick"><span class="dev" lang="hi">शांत</span> · Shaant</p>
+          <p class="h" data-split="word">You came to the hills for quiet.</p>
+        </div>
+      </div>
+      <div class="band b2 e-scatter" data-a="0.28" data-b="0.50" data-spread="0.42">
+        <div class="in">
+          <p class="h" data-split="char">Then the town was full.</p>
+          <p class="sub">An hour stuck on Mall Road, and hotels at weekend prices.</p>
+        </div>
+      </div>
+      <div class="band b3 e-blur" data-a="0.56" data-b="0.74">
+        <div class="in">
+          <div class="stack"><p class="h sharp">The quiet is still there.</p><p class="h soft" aria-hidden="true">The quiet is still there.</p></div>
+          <p class="sub">Just on a different day.</p>
+        </div>
+      </div>
+      <div class="band b4 e-rise" id="b4" data-a="0.80" data-b="1" data-ramp="0.034">
+        <div class="in">
+          <p class="kick"><span class="dev" lang="hi">शांत</span> · Shaant</p>
+          <h1 class="h" data-split="word">Where do you want to go?</h1>
+          <p class="sub">Type a place in Uttarakhand. See how crowded it will be, the weather, stays in your budget, what to see, and the drive.</p>
+          <div class="cta">
+            <form class="search" id="search" role="search" autocomplete="off" novalidate>
+              <div class="field q">
+                <label for="q">Place</label>
+                <input id="q" type="text" placeholder="Try Mussoorie" spellcheck="false"
+                       role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+                <ul class="suggest" id="suggest" role="listbox" aria-label="Places" hidden></ul>
+              </div>
+              <div class="field">
+                <label for="d">When</label>
+                <input id="d" type="date">
+              </div>
+              <button class="go" type="submit">Show me</button>
+            </form>
+            <div class="popular" id="popular"><span>Popular:</span></div>
+            <div class="msg" id="msg" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </header>
 
-<section class="hero" id="hero">
-  <div class="wrap">
-    <h1>Where do you want to go?</h1>
-    <p class="lede">Type a place in Uttarakhand. You get how crowded it is, the weather, hotels in your budget, what to see, and how far it is from you.</p>
+<main id="main" tabindex="-1">
 
-    <form class="search" id="search" role="search" autocomplete="off" novalidate>
-      <div class="field q">
-        <label for="q">Place</label>
-        <input id="q" type="text" placeholder="Try Mussoorie" spellcheck="false"
-               role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
-        <ul class="suggest" id="suggest" role="listbox" aria-label="Places" hidden></ul>
-      </div>
-      <div class="field">
-        <label for="d">When</label>
-        <input id="d" type="date">
-      </div>
-      <button class="go" type="submit">Show me</button>
-    </form>
+  <!-- ===================== RESULTS, shown after a search ===================== -->
+  <div class="out wrap" id="out" hidden>
+    <div class="head" id="head">
+      <p class="eyebrow" id="p-kind"></p>
+      <h2 id="p-name"></h2>
+      <p class="when" id="p-when"></p>
+      <a class="btn-line again" href="#plan">Search another place</a>
+    </div>
 
-    <div class="popular" id="popular"><span>Popular:</span></div>
-    <div class="msg" id="msg" aria-live="polite"></div>
+    <section aria-label="At a glance">
+      <div class="glance">
+        <article class="g crowd" id="crowd"></article>
+        <article class="g weather" id="weather"></article>
+        <article class="g far" id="far"></article>
+      </div>
+      <p class="fine">Crowd levels come from a model trained on sample data, so read them as a guide to the season, not a headcount.</p>
+    </section>
+
+    <section class="block" id="stay" aria-labelledby="stay-h">
+      <p class="step">Where to stay</p>
+      <h3 id="stay-h">What is your budget for one night?</h3>
+      <div class="budget">
+        <div class="b-top">
+          <label for="b-in">Drag the bar, or type an amount</label>
+          <div class="b-input"><span aria-hidden="true">₹</span>
+            <input id="b-in" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-describedby="b-fit">
+            <small>a night</small></div>
+          <p class="b-fit" id="b-fit" aria-live="polite"></p>
+        </div>
+        <div class="b-slider">
+          <div class="b-marks" id="b-marks" aria-hidden="true"></div>
+          <input class="b-range" id="b-range" type="range" min="0" max="1000" step="1" aria-label="Budget for one night">
+        </div>
+        <div class="b-scale" id="b-scale" aria-hidden="true"></div>
+      </div>
+      <div class="carousel" id="stay-car">
+        <div class="car-view">
+          <button type="button" class="car-btn prev" aria-label="Previous stays"></button>
+          <div class="track" id="stays" tabindex="0" role="group" aria-label="Stays that fit your budget"></div>
+          <button type="button" class="car-btn next" aria-label="More stays"></button>
+        </div>
+        <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
+      </div>
+      <div class="empty" id="stays-empty" hidden></div>
+      <p class="note">Each tick on the bar is a stay here. Only well-known stays are named. Prices are rough and change a lot with the season and at weekends, so tap Check price for today's rate.</p>
+    </section>
+
+    <section class="block" id="see" aria-labelledby="see-h">
+      <p class="step">Places to see</p>
+      <h3 id="see-h"></h3>
+      <div class="carousel" id="spot-car">
+        <div class="car-view">
+          <button type="button" class="car-btn prev" aria-label="Previous places"></button>
+          <div class="track" id="spots" tabindex="0" role="group" aria-label="Places to see"></div>
+          <button type="button" class="car-btn next" aria-label="More places"></button>
+        </div>
+        <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
+      </div>
+      <p class="note" id="spots-note"></p>
+    </section>
+
+    <section class="block" id="route" aria-labelledby="route-h">
+      <p class="step">Getting there</p>
+      <h3 id="route-h"></h3>
+      <div class="route-ctl">
+        <button class="btn" type="button" id="locate"></button>
+        <span class="or">or</span>
+        <form class="from" id="from-form" autocomplete="off">
+          <label class="sr" for="from">Your city</label>
+          <input id="from" type="text" placeholder="Type your city, like Delhi" spellcheck="false">
+          <button type="submit">Go</button>
+        </form>
+      </div>
+      <div class="rsum" id="rsum" aria-live="polite"></div>
+      <p class="go-note" id="go-note" hidden></p>
+      <div class="map" id="map"></div>
+      <div class="route-foot">
+        <p class="note" id="route-note">Drive times are estimates that allow for hill roads. Google Maps has live traffic.</p>
+        <a class="btn ghost" id="gmaps" href="#" target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+    </section>
   </div>
-  <svg class="ridge" viewBox="0 0 1400 70" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0 52 C230 34 420 70 640 52 860 34 1080 66 1400 48"/>
-    <path d="M0 64 C240 46 430 82 650 64 870 46 1090 80 1400 60"/>
-  </svg>
-</section>
 
-<main class="out wrap" id="out" hidden>
+  <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 18 C150 15 300 21 450 18 S750 15 900 18 1050 21 1200 18"/><path d="M160 28 C320 26 480 30 640 28 S940 26 1040 28"/></svg></div>
 
-  <div class="head" id="head">
-    <p class="eyebrow" id="p-kind"></p>
-    <h2 id="p-name"></h2>
-    <p class="when" id="p-when"></p>
-  </div>
-
-  <!-- 1. at a glance -->
-  <section aria-label="At a glance">
-    <div class="glance">
-      <article class="g crowd" id="crowd"></article>
-      <article class="g weather" id="weather"></article>
-      <article class="g far" id="far"></article>
-    </div>
-    <p class="fine">Crowd levels come from a model trained on sample data, so read them as a guide to the season, not a headcount.</p>
-  </section>
-
-  <!-- 2. where to stay -->
-  <section class="block" id="stay" aria-labelledby="stay-h">
-    <p class="step">Where to stay</p>
-    <h3 id="stay-h">What is your budget for one night?</h3>
-    <div class="budget">
-      <div class="b-top">
-        <label for="b-in">Drag the bar, or type an amount</label>
-        <div class="b-input"><span aria-hidden="true">₹</span>
-          <input id="b-in" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" aria-describedby="b-fit">
-          <small>a night</small></div>
-        <p class="b-fit" id="b-fit" aria-live="polite"></p>
+  <!-- ===================== 1. HOW TO READ IT ===================== -->
+  <section class="sec" id="calm" aria-labelledby="calm-h">
+    <div class="motes" aria-hidden="true"><i style="--x:6%;--y:18%;--s:140px;--d:30s;--dl:-5s"></i><i style="--x:78%;--y:30%;--s:110px;--d:24s;--dl:-11s"></i><i style="--x:40%;--y:72%;--s:160px;--d:34s;--dl:-17s"></i><i style="--x:88%;--y:80%;--s:90px;--d:27s;--dl:-2s"></i></div>
+    <div class="wrap">
+      <div class="head-c rise">
+        <p class="kicker">How to read it</p>
+        <h2 class="h2" id="calm-h">Three kinds of day, and what each one feels like.</h2>
       </div>
-      <div class="b-slider">
-        <div class="b-marks" id="b-marks" aria-hidden="true"></div>
-        <input class="b-range" id="b-range" type="range" min="0" max="1000" step="1" aria-label="Budget for one night">
+      <div class="waters stagger">
+        <article class="water quiet"><div class="lake" data-level="0" aria-hidden="true"></div><h3>Not crowded</h3><p>Quiet roads and easy rooms. You can hear the river.</p></article>
+        <article class="water steady"><div class="lake" data-level="1" aria-hidden="true"></div><h3>Normal crowd</h3><p>The usual number of people. Book a day or two ahead.</p></article>
+        <article class="water busy"><div class="lake" data-level="2" aria-hidden="true"></div><h3>Very crowded</h3><p>Queues, slow traffic and full hotels. Pick another day if you can.</p></article>
       </div>
-      <div class="b-scale" id="b-scale" aria-hidden="true"></div>
-    </div>
-    <div class="carousel" id="stay-car">
-      <div class="car-view">
-        <button type="button" class="car-btn prev" aria-label="Previous stays"></button>
-        <div class="track" id="stays" tabindex="0" role="group" aria-label="Stays that fit your budget"></div>
-        <button type="button" class="car-btn next" aria-label="More stays"></button>
-      </div>
-      <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
-    </div>
-    <div class="empty" id="stays-empty" hidden></div>
-    <p class="note">Each tick on the bar is a stay here. Only well-known stays are named. Prices are rough and change a lot with the season and at weekends, so tap Check price for today's rate.</p>
-  </section>
-
-  <!-- 3. places to see -->
-  <section class="block" id="see" aria-labelledby="see-h">
-    <p class="step">Places to see</p>
-    <h3 id="see-h"></h3>
-    <div class="carousel" id="spot-car">
-      <div class="car-view">
-        <button type="button" class="car-btn prev" aria-label="Previous places"></button>
-        <div class="track" id="spots" tabindex="0" role="group" aria-label="Places to see"></div>
-        <button type="button" class="car-btn next" aria-label="More places"></button>
-      </div>
-      <div class="car-foot"><p class="car-count"></p><div class="car-dots" aria-hidden="true"></div></div>
-    </div>
-    <p class="note" id="spots-note"></p>
-  </section>
-
-  <!-- 4. how far -->
-  <section class="block" id="route" aria-labelledby="route-h">
-    <p class="step">Getting there</p>
-    <h3 id="route-h"></h3>
-    <div class="route-ctl">
-      <button class="btn" type="button" id="locate"></button>
-      <span class="or">or</span>
-      <form class="from" id="from-form" autocomplete="off">
-        <label class="sr" for="from">Your city</label>
-        <input id="from" type="text" placeholder="Type your city, like Delhi" spellcheck="false">
-        <button type="submit">Go</button>
-      </form>
-    </div>
-    <div class="rsum" id="rsum" aria-live="polite"></div>
-    <p class="go-note" id="go-note" hidden></p>
-    <div class="map" id="map"></div>
-    <div class="route-foot">
-      <p class="note" id="route-note">Drive times are estimates that allow for hill roads. Google Maps has live traffic.</p>
-      <a class="btn ghost" id="gmaps" href="#" target="_blank" rel="noopener">Open in Google Maps</a>
+      <p class="note rise">When your day is very crowded, Shaant shows the nearest calmer day. One tap moves your plan to it.</p>
     </div>
   </section>
 
+  <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 20 C140 23 280 17 420 20 S700 23 840 20 1060 17 1200 20"/><path d="M300 30 C440 28 580 32 720 30 S960 28 1100 30"/></svg></div>
+
+  <!-- ===================== 2. THE OTHER WAY ===================== -->
+  <section class="sec" id="twins" aria-labelledby="twins-h">
+    <div class="wrap">
+      <div class="head-s rise">
+        <div><p class="kicker">The other way</p><h2 class="h2" id="twins-h">Move the date, or move the place.</h2></div>
+        <p class="lede">When the famous towns fill up, these stay calm. Same mountains, far fewer people.</p>
+      </div>
+      <div class="twins stagger">
+        <article class="twin"><img src="assets/place-chopta.jpg" alt="A misty meadow ringed by pine forest below snow peaks at dawn" loading="lazy" width="1400" height="1045">
+          <div class="t"><p class="alt">Meadows and trek</p><h3>Chopta</h3><p>Meadows and pine forest at 2,680 m. Camps and guesthouses, no hotel strip.</p><button type="button" class="btn-line" data-site="Chopta">See Chopta</button></div></article>
+        <article class="twin"><img src="assets/place-munsiyari.jpg" alt="Five snow peaks above a valley full of cloud, seen past old stone terraces" loading="lazy" width="1400" height="1045">
+          <div class="t"><p class="alt">Mountain views</p><h3>Munsiyari</h3><p>The Panchachuli peaks fill the sky here. A long drive, with almost nobody on it.</p><button type="button" class="btn-line" data-site="Munsiyari">See Munsiyari</button></div></article>
+        <article class="twin"><img src="assets/place-mukteshwar.jpg" alt="A rocky cliff edge with old fruit trees above a misty valley and far snow peaks" loading="lazy" width="1400" height="1045">
+          <div class="t"><p class="alt">Orchards and cliffs</p><h3>Mukteshwar</h3><p>Orchards, an old hilltop temple and the cliffs at Chauli Ki Jali. Past Nainital, and much quieter.</p><button type="button" class="btn-line" data-site="Mukteshwar">See Mukteshwar</button></div></article>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 19 C160 16 320 22 480 19 S800 16 960 19 1120 22 1200 19"/><path d="M80 29 C240 27 400 31 560 29 S860 27 980 29"/></svg></div>
+
+  <!-- ===================== 3. GOOD TO KNOW ===================== -->
+  <section class="sec" id="faq" aria-labelledby="faq-h">
+    <div class="wrap faq-grid">
+      <div class="faq-title rise"><p class="kicker">Good to know</p><h2 class="h2" id="faq-h">Before you go</h2></div>
+      <div class="qas stagger">
+        <details class="qa"><summary>When is the best time to go?<i aria-hidden="true"></i></summary><p>For clear skies and open roads, March to early June and mid September to November. July and August are monsoon months, when landslides can shut roads for a day or more. December and January bring snow to the higher places.</p></details>
+        <details class="qa"><summary>Are long weekends really that bad?<i aria-hidden="true"></i></summary><p>Yes. On busy weekends Nainital has only let cars in with a hotel booking, and the queue at the Rusi bypass ran two kilometres. Mall Road in Mussoorie can take over an hour. If your day shows Very crowded, try the calmer day Shaant suggests.</p></details>
+        <details class="qa"><summary>Why is the drive longer than Google Maps says?<i aria-hidden="true"></i></summary><p>Hill roads are narrow and often one lane. Trucks back up to let cars pass, and there are road works on the way. Shaant adds time for that and for the climb. Try to arrive before dark, because night driving in the hills is best avoided.</p></details>
+        <details class="qa"><summary>How sure is the crowd forecast?<i aria-hidden="true"></i></summary><p>Treat it as a guide to the season, not a promise. The model learned from sample data, so it knows busy months from quiet ones but cannot yet tell one town's crowd apart from another's.</p></details>
+        <details class="qa"><summary>Are the hotel prices exact?<i aria-hidden="true"></i></summary><p>No. They are rough ranges that change with the season and at weekends. Tap Check price on any card for today's rate.</p></details>
+        <details class="qa"><summary>Does Shaant send what I type anywhere?<i aria-hidden="true"></i></summary><p>The place you search stays in your browser. If you share your location or type a city, it goes only to the route service to draw the drive.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 4. THE CLOSE ===================== -->
+  <section class="sec" id="go" aria-labelledby="go-h">
+    <div class="bg" id="go-bg" aria-hidden="true"></div>
+    <div class="motes" aria-hidden="true"><i style="--x:14%;--y:40%;--s:150px;--d:32s;--dl:-8s"></i><i style="--x:70%;--y:22%;--s:120px;--d:26s;--dl:-14s"></i><i style="--x:52%;--y:66%;--s:170px;--d:36s;--dl:-3s"></i></div>
+    <div class="wrap rise">
+      <h2 class="h2" id="go-h"><span class="l">The mountains will wait.</span> <span class="l">The crowd will not.</span></h2>
+      <p class="lede">Pick the calm day before you book the room.</p>
+      <a class="btn" href="#plan">Where do you want to go?</a>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>Shaant, for Uttarakhand. Type a place, see everything.</p>
+    <p class="brand"><span class="dev" lang="hi">शांत</span>Shaant</p>
+    <p>Shaant, for Uttarakhand. Find the calm version of your trip.</p>
+    <p class="fine">Pictures on this site are AI-made. Crowd forecasts come from a model trained on sample data.</p>
     <p class="fine">Weather from Open-Meteo. Map tiles &copy; Esri, map data &copy; OpenStreetMap contributors. Routes from the OSRM route service. Hotel names and prices are rough guides, not quotes.</p>
     <p class="fine">Your starting point is sent only to the route service to draw the line, and remembered in this browser so you do not have to type it again.</p>
   </div>
@@ -817,7 +1158,6 @@ function show(site, d, opts){
   var token = ++renderToken, meta = PLACES[site];
 
   $('out').hidden = false;
-  $('hero').classList.add('compact');
   document.title = site+' · Shaant';
 
   $('p-kind').textContent = meta.kind+' · '+meta.alt.toLocaleString('en-IN')+' m up';
@@ -837,7 +1177,8 @@ function show(site, d, opts){
     try{ history[opts.push && siteChanged ? 'pushState' : 'replaceState'](null, '', h); }
     catch(e){ location.hash = h; }
   }
-  if(opts.scroll) $('head').scrollIntoView({behavior: reduceMotion.matches ? 'auto' : 'smooth', block:'start'});
+  /* 'instant', not 'auto': the page sets scroll-behavior smooth, which 'auto' would inherit */
+  if(opts.scroll) $('head').scrollIntoView({behavior: opts.instant ? 'instant' : reduceMotion.matches ? 'auto' : 'smooth', block:'start'});
 }
 
 /* ---------- crowd ---------- */
@@ -884,6 +1225,7 @@ function renderCrowd(site, d){
   var html = '<p class="lab">Crowd</p>'+
     '<div class="people" aria-hidden="true">'+people+'</div>'+
     '<p class="big">'+C.word+'</p>'+
+    '<div class="lake" aria-hidden="true">'+lakeSVG(C.rank)+'</div>'+
     '<p class="say">'+C.say+'</p>'+
     '<p class="small">About '+r.vis.toLocaleString('en-IN')+' visitors expected that day. The model is '+r.conf+'% sure.</p>';
   var q = quieterDay(site, d, C.rank);
@@ -1502,7 +1844,8 @@ function fromHash(){
   var d = parts[1] ? new Date(parts[1]+'T00:00:00') : null;
   return {site:site, date:d && !isNaN(d) ? d : null};
 }
-function openFromHash(){
+/* a shared link like #mussoorie/2026-10-03 skips the journey and opens on the answer */
+function openFromHash(first){
   var r = fromHash();
   if(!r) return;
   if(r.date) dIn.value = iso(r.date);
@@ -1510,12 +1853,329 @@ function openFromHash(){
   if(r.site === current.site && current.date && iso(d) === iso(current.date)) return;
   qIn.value = r.site;
   msgEl.innerHTML = '';
-  show(r.site, d, {});
+  show(r.site, d, first === true ? {scroll:true, instant:true} : {});
 }
-window.addEventListener('popstate', openFromHash);
-window.addEventListener('hashchange', openFromHash);
-openFromHash();
+window.addEventListener('popstate', function(){ openFromHash(); });
+window.addEventListener('hashchange', function(){ openFromHash(); });
 
+
+/* ============================================================
+   6. The lake line, the site's signature: glass on a calm day,
+      a slow ripple on a normal one, choppy when it is crowded.
+      Every frequency divides 400, so the drift loops seamlessly.
+   ============================================================ */
+function lakeSVG(level){
+  var c = [
+    {a:.7, f:1, a2:0,   f2:0, dur:18},
+    {a:3.2,f:2, a2:1.2, f2:5, dur:11},
+    {a:6.5,f:4, a2:3.4, f2:9, dur:6}
+  ][level] || {a:3.2, f:2, a2:0, f2:0, dur:11};
+  function line(y0, s){
+    var d = '', x, y;
+    for(x = 0; x <= 800; x += 5){
+      y = y0 + s*(c.a*Math.sin(2*Math.PI*c.f*x/400) + c.a2*Math.sin(2*Math.PI*c.f2*x/400 + 1.3));
+      d += (x ? 'L' : 'M')+x+' '+y.toFixed(2);
+    }
+    return '<path d="'+d+'"/>';
+  }
+  return '<svg viewBox="0 0 800 40" preserveAspectRatio="none" style="--dur:'+c.dur+'s">'+line(16, 1)+line(27, .55)+'</svg>';
+}
+[].forEach.call(document.querySelectorAll('.water .lake'), function(el){
+  el.innerHTML = lakeSVG(+el.getAttribute('data-level'));
+});
+
+/* ============================================================
+   7. Text splitting, seeded so it is identical on every load
+   ============================================================ */
+function rng(seed){ var s = seed>>>0; return function(){ s = (s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function split(el, mode, spread){
+  var text = el.textContent, r = rng(text.length*7919 + mode.length);
+  var sr = document.createElement('span'); sr.className = 'sr'; sr.textContent = text;
+  var vis = document.createElement('span'); vis.setAttribute('aria-hidden','true');
+  var words = text.split(' '), total = 0, ci = 0, i, j;
+  for(i=0;i<words.length;i++) total += words[i].length;
+  for(i=0;i<words.length;i++){
+    var w = document.createElement('span'); w.className = 'w';
+    if(mode === 'word'){
+      w.style.setProperty('--th', (i/Math.max(1,words.length))*0.5);
+      w.textContent = words[i]+(i < words.length-1 ? ' ' : '');
+    } else {
+      for(j=0;j<words[i].length;j++){
+        var ch = document.createElement('span'); ch.className = 'c';
+        ch.style.setProperty('--th', (ci/Math.max(1,total))*(spread||0.4) + r()*0.06);
+        ch.style.setProperty('--jx', ((r()*2-1)*54).toFixed(1)+'px');
+        ch.style.setProperty('--jy', ((r()*2-1)*38).toFixed(1)+'px');
+        ch.style.setProperty('--jr', ((r()*2-1)*16).toFixed(1)+'deg');
+        ch.textContent = words[i][j];
+        w.appendChild(ch); ci++;
+      }
+      if(i < words.length-1) w.appendChild(document.createTextNode(' '));
+    }
+    vis.appendChild(w);
+  }
+  el.textContent = ''; el.appendChild(sr); el.appendChild(vis);
+}
+[].forEach.call(document.querySelectorAll('[data-split]'), function(el){
+  var band = el.closest('.band');
+  split(el, el.getAttribute('data-split'), band ? parseFloat(band.getAttribute('data-spread')||0.4) : 0.4);
+});
+
+/* ============================================================
+   8. The scrub hero
+   ============================================================ */
+var VIDEO_URL = 'assets/hero-scrub.mp4', VIDEO_BYTES = 2187960;
+var POSTER_URL = 'assets/hero-poster.jpg', ENDING_URL = 'assets/hero-ending.jpg';
+var heroRegion = $('hero-region'), stage = $('stage'), video = $('hero'), ring = $('ring');
+var posterEl = $('poster'), b4 = $('b4'), posterEnd = null;
+var bands = [].slice.call(document.querySelectorAll('.band')).map(function(el){
+  return {el:el, a:parseFloat(el.getAttribute('data-a')), b:parseFloat(el.getAttribute('data-b')),
+          ramp:parseFloat(el.getAttribute('data-ramp')||0)||0, op:-1, k:-1};
+});
+
+function heroProgress(){
+  var range = heroRegion.offsetHeight - window.innerHeight;
+  if(range <= 0) return 0;
+  return Math.min(1, Math.max(0, -heroRegion.getBoundingClientRect().top / range));
+}
+function smoothstep(p, e0, e1){ var t = Math.min(1, Math.max(0, (p-e0)/(e1-e0))); return t*t*(3-2*t); }
+function clamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+
+var loadK = 0, lastHp = -1, lastPe = -1, live = false;
+function updateCaptions(p){
+  if(Math.abs(p-lastHp) > 0.002){ stage.style.setProperty('--hp', p.toFixed(3)); lastHp = p; }
+  for(var i=0;i<bands.length;i++){
+    var B = bands[i], a = B.a, b = B.b, f = Math.min(0.02, (b-a)/3);
+    var op = (i === 0 ? 1 : smoothstep(p, a, a+f)) * (i === bands.length-1 ? 1 : 1 - smoothstep(p, b-f, b));
+    var k = clamp((p-a)/(B.ramp || Math.min(0.025, (b-a)*0.35)), 0, 1);
+    if(i === 0) k = Math.max(k, loadK);
+    if(Math.abs(op-B.op) > 0.004){ B.el.style.opacity = op.toFixed(3); B.op = op; }
+    if(Math.abs(k-B.k) > 0.008){
+      B.el.style.setProperty('--k', k.toFixed(3));
+      if(i === bands.length-1){
+        B.el.style.setProperty('--ks', clamp((k-0.60)*3.4, 0, 1).toFixed(3));
+        B.el.style.setProperty('--kb', clamp((k-0.76)*4.6, 0, 1).toFixed(3));
+      }
+      B.k = k;
+    }
+  }
+  /* the search takes clicks only once its band is fully in */
+  var isLive = bands[bands.length-1].op > 0.9;
+  if(isLive !== live){ live = isLive; b4.classList.toggle('live', live); }
+  /* no video: the still journey still arrives at the lake */
+  if(posterEnd){
+    var pe = smoothstep(p, 0.5, 0.82);
+    if(Math.abs(pe-lastPe) > 0.004){ posterEnd.style.opacity = pe.toFixed(3); lastPe = pe; }
+  }
+}
+
+/* gated seeks: never write currentTime while a seek is in flight */
+var seekBusy = false, pendingTime = null;
+function requestSeek(t){
+  if(!video.duration) return;
+  if(seekBusy){ pendingTime = t; return; }
+  seekBusy = true; video.currentTime = t;
+}
+video.addEventListener('seeked', function(){
+  seekBusy = false;
+  if(pendingTime !== null){ var t = pendingTime; pendingTime = null; requestSeek(t); }
+});
+video.addEventListener('error', function(){ seekBusy = false; pendingTime = null; if(video.getAttribute('src')) failVideo(); });
+
+/* the rAF loop that rests when it has caught up, and when the hero is off screen */
+var target = 0, shown = 0, rafId = null, lastTick = 0, heroOnScreen = true, scrubOn = false;
+function tick(now){
+  var dt = Math.min(100, now-(lastTick||now)); lastTick = now;
+  shown += (target-shown)*(1-Math.pow(1-0.16, dt/16.667));
+  if(Math.abs(target-shown) < 0.0005 && loadK >= 1){ shown = target; rafId = null; lastTick = 0; }
+  else rafId = requestAnimationFrame(tick);
+  if(video.duration) requestSeek(shown*video.duration);
+  updateCaptions(shown);
+}
+function onScroll(){
+  target = heroProgress();
+  if(rafId === null && heroOnScreen) rafId = requestAnimationFrame(tick);
+}
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(es){
+    heroOnScreen = es[0].isIntersecting;
+    if(heroOnScreen && rafId === null && scrubOn) rafId = requestAnimationFrame(tick);
+  }, {rootMargin:'10px'}).observe(heroRegion);
+}
+
+/* band one assembles once on load, then hands over to the scroll */
+function runLoadRamp(){
+  var t0 = performance.now();
+  (function step(now){
+    loadK = clamp((now-t0)/1100, 0, 1);
+    updateCaptions(shown);
+    if(loadK < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+/* the poster wins the bandwidth race, then the video streams in behind a progress ring */
+var started = false;
+function startBlobFetch(){ if(started) return; started = true; loadHeroBlob().catch(failVideo); }
+function initHeroOnce(){
+  if(initHeroOnce.done) return; initHeroOnce.done = true;
+  runLoadRamp();
+  var img = new Image();
+  img.onload = function(){ posterEl.style.backgroundImage = "url('"+POSTER_URL+"')"; startBlobFetch(); };
+  img.onerror = startBlobFetch;
+  img.src = POSTER_URL;
+  setTimeout(startBlobFetch, 4000);
+}
+function loadHeroBlob(){
+  return new Promise(function(resolve, reject){
+    /* a double-clicked file cannot fetch; the still journey carries the hero instead */
+    if(location.protocol === 'file:'){ reject(new Error('file protocol')); return; }
+    var ctrl = new AbortController(), watchdog = setTimeout(function(){ ctrl.abort(); }, 20000);
+    fetch(VIDEO_URL, {priority:'low', signal:ctrl.signal}).then(function(res){
+      if(!res.ok || !res.body) throw new Error('no video');
+      ring.classList.add('on');
+      var total = Number(res.headers.get('Content-Length')) || VIDEO_BYTES;
+      var reader = res.body.getReader(), chunks = [], got = 0, lastRing = 0;
+      function pump(){
+        return reader.read().then(function(r){
+          if(r.done){
+            clearTimeout(watchdog);
+            ring.style.setProperty('--ld', 0);
+            ring.classList.remove('on');
+            video.src = URL.createObjectURL(new Blob(chunks, {type:'video/mp4'}));
+            video.load();
+            video.addEventListener('loadeddata', function(){
+              requestSeek(shown*video.duration);
+              stage.classList.add('video-ready');
+            }, {once:true});
+            resolve(); return;
+          }
+          clearTimeout(watchdog);
+          watchdog = setTimeout(function(){ ctrl.abort(); }, 20000);
+          chunks.push(r.value); got += r.value.length;
+          var frac = Math.min(1, got/total), now = performance.now();
+          if(now-lastRing > 100 || frac === 1){ lastRing = now; ring.style.setProperty('--ld', Math.round(126*(1-frac))); }
+          return pump();
+        });
+      }
+      return pump();
+    }).catch(function(e){ clearTimeout(watchdog); reject(e); });
+  });
+}
+function failVideo(){
+  if(posterEnd) return;
+  ring.classList.remove('on');
+  stage.classList.add('video-failed');
+  posterEnd = document.createElement('div');
+  posterEnd.className = 'poster';
+  posterEnd.setAttribute('aria-hidden', 'true');
+  posterEnd.style.opacity = 0;
+  posterEnd.style.backgroundImage = "url('"+ENDING_URL+"')";
+  posterEl.parentNode.insertBefore(posterEnd, posterEl.nextSibling);
+  lastPe = -1;
+  updateCaptions(shown);
+}
+
+/* keyboard users who tab into the search are taken to where it is visible */
+function planTop(){ return heroRegion.offsetTop + heroRegion.offsetHeight - window.innerHeight; }
+b4.addEventListener('focusin', function(){
+  if(scrubOn && heroProgress() < 0.97) window.scrollTo({top:planTop(), behavior:'instant'});
+});
+
+/* the five static-hero gates: identical to the CSS, kept live */
+var GATES = [
+  '(max-width: 720px)',
+  '(orientation: portrait) and (max-width: 1024px)',
+  '(orientation: portrait) and (pointer: coarse)',
+  '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  '(prefers-reduced-motion: reduce)'
+];
+function enableScrub(){
+  if(scrubOn) return; scrubOn = true;
+  initHeroOnce();
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onScroll);
+  unpinFinalStates();
+  updateCaptions(heroProgress());
+  onScroll();
+}
+function disableScrub(){
+  if(!scrubOn) return; scrubOn = false;
+  window.removeEventListener('scroll', onScroll);
+  window.removeEventListener('resize', onScroll);
+  if(rafId !== null){ cancelAnimationFrame(rafId); rafId = null; }
+}
+function applyHeroMode(){
+  if(GATES.some(function(q){ return matchMedia(q).matches; })) disableScrub();
+  else enableScrub();
+}
+var MQLS = GATES.map(function(q){ return matchMedia(q); });
+MQLS.forEach(function(m){
+  if(m.addEventListener) m.addEventListener('change', applyHeroMode);
+  else if(m.addListener) m.addListener(applyHeroMode);
+});
+
+/* ============================================================
+   9. Reduced motion, honoured live and in both directions
+   ============================================================ */
+function pinToFinalStates(){
+  document.body.classList.add('pinned');
+  [].forEach.call(document.querySelectorAll('.rise,.stagger,.shore'), function(el){ el.classList.add('in','done'); });
+  if(rafId !== null){ cancelAnimationFrame(rafId); rafId = null; }
+}
+function unpinFinalStates(){
+  document.body.classList.remove('pinned');
+  bands.forEach(function(b){ b.op = -1; b.k = -1; });
+}
+function onRM(e){ if(e.matches) pinToFinalStates(); else applyHeroMode(); }
+if(reduceMotion.addEventListener) reduceMotion.addEventListener('change', onRM);
+else if(reduceMotion.addListener) reduceMotion.addListener(onRM);
+
+/* ============================================================
+   10. Entrances, dividers, mist, the close, the quieter places
+   ============================================================ */
+[].forEach.call(document.querySelectorAll('.shore path'), function(p){
+  var len = 1500;
+  try{ len = Math.ceil(p.getTotalLength()); }catch(e){}
+  p.style.setProperty('--len', len);
+});
+if('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('in');
+      if(e.target.classList.contains('stagger')) setTimeout(function(){ e.target.classList.add('done'); }, 1400);
+      io.unobserve(e.target);
+    });
+  }, {threshold:.14, rootMargin:'0px 0px -8% 0px'});
+  [].forEach.call(document.querySelectorAll('.rise,.stagger,.shore'), function(el){ io.observe(el); });
+  var mio = new IntersectionObserver(function(es){
+    es.forEach(function(e){ e.target.classList.toggle('on', e.isIntersecting); });
+  });
+  [].forEach.call(document.querySelectorAll('.motes'), function(el){ mio.observe(el); });
+  /* the ending frame behind the close loads only when the close is near */
+  var gio = new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){ $('go-bg').classList.add('on'); gio.disconnect(); }
+  }, {rootMargin:'600px 0px'});
+  gio.observe($('go'));
+} else {
+  [].forEach.call(document.querySelectorAll('.rise,.stagger,.shore'), function(el){ el.classList.add('in','done'); });
+  $('go-bg').classList.add('on');
+}
+
+document.querySelector('.twins').addEventListener('click', function(e){
+  var b = e.target.closest('[data-site]'); if(!b) return;
+  choose({site:b.getAttribute('data-site'), label:'', kind:'place'}, '');
+});
+
+document.addEventListener('visibilitychange', function(){
+  document.body.classList.toggle('paused', document.hidden);
+});
+
+/* ============================================================
+   11. Boot
+   ============================================================ */
+applyHeroMode();
+if(reduceMotion.matches) pinToFinalStates();
+openFromHash(true);
 })();
 </script>
 </body>
