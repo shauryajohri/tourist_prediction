@@ -1,14 +1,20 @@
 SHAANT
-Type a place, see everything.
+Find the calm version of your trip.
 ================================================================
 
 HOW TO OPEN IT
 --------------
-Double-click  index.html
+The full version is online (Netlify). Scroll down from the top and
+the page drops through the clouds to a still lake, where the search
+box is waiting.
 
-It opens in your web browser. Nothing to install. No Python. No
-terminal. Type a place (spelling does not matter, "massori" finds
-Mussoorie) and the page shows, in order:
+Or double-click  index.html  in this folder. Browsers do not let a
+double-clicked file load a video, so the opening becomes still
+pictures that fade from the clouds to the lake. Everything else works
+the same. Nothing to install. No Python. No terminal.
+
+Type a place (spelling does not matter, "massori" finds Mussoorie)
+and the page shows, in order:
 
   1. how crowded it will be on your date
   2. the weather
@@ -16,11 +22,12 @@ Mussoorie) and the page shows, in order:
   4. the places to see there
   5. a map of the drive from where you are
 
-The crowd, hotels and places work offline. The live weather, the
-map and the route need an internet connection.
+Below that: how to read quiet, normal and very crowded days, three
+quieter places to try instead, and answers to common questions.
 
-It is also online, published from the gh-pages branch of the
-GitHub repo with GitHub Pages.
+The crowd, hotels and places work offline. The live weather, the
+map and the route need an internet connection. On phones the page
+shows a still picture of the lake instead of the scrolling video.
 
 
 HOW TO SHARE IT WITH SOMEONE
@@ -38,6 +45,11 @@ assets/data.js    Your model's answers, worked out in advance.
                   to 31 Dec 2028.
 assets/places.js  The 29 destinations: places to see, map
                   coordinates, and the hotel lists.
+assets/hero-scrub.mp4    The opening video the scroll moves through.
+assets/hero-poster.jpg   Its first frame, shown while it loads.
+assets/hero-ending.jpg   The lake: phones, and the closing section.
+assets/place-*.jpg       Chopta, Munsiyari and Mukteshwar.
+                  All pictures and the video are AI-made.
 READ-ME-FIRST.txt This file.
 
 
