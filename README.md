@@ -2,7 +2,7 @@
 
 **Know the rush before you go.** Type a place in Uttarakhand and one page tells you how crowded it will be on your date, what the weather will do, which hotels fit your budget, what to see there, and how far it is from you.
 
-**Live site: https://shaant.netlify.app**
+**Live site: https://shauryajohri.github.io/tourist_prediction/**
 
 The page opens with a scroll-driven film: scrolling down drops you through the clouds onto a still mountain lake, where the search box waits. Phones get a still picture of the lake instead. The planner underneath works exactly as shown below.
 
