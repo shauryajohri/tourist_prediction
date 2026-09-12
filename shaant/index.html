@@ -535,6 +535,31 @@ main{position:relative;z-index:2;background:transparent}
 .water p{color:#c9d3df;font-size:16px}
 #calm .note{margin:30px auto 0;text-align:center;font-size:15px;color:var(--text-secondary)}
 
+/* ---------- 2. under the hood: the model, in three cards ---------- */
+#works .head-s{display:grid;grid-template-columns:1.1fr 1fr;gap:18px 60px;align-items:end}
+@media (max-width:860px){#works .head-s{grid-template-columns:1fr}}
+.works{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:48px}
+@media (max-width:900px){.works{grid-template-columns:1fr}}
+.work{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px 24px 22px;
+  display:flex;flex-direction:column;gap:10px;
+  transition:translate .45s var(--ease),border-color .45s var(--ease)}
+.work:hover{translate:0 -4px;border-color:var(--line-strong)}
+.work .step{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--lake)}
+.work h3{font-size:23px}
+.work p{color:#c9d3df;font-size:15.5px;line-height:1.55}
+.work .tools{margin-top:auto;padding-top:16px;display:flex;flex-wrap:wrap;gap:7px}
+.work .tools span{font-family:var(--mono);font-size:11.5px;line-height:1.5;color:var(--text-secondary);
+  border:1px solid var(--line-strong);border-radius:999px;padding:3px 10px}
+
+/* the accuracy line, set apart so it cannot be mistaken for a claim */
+.honest{margin-top:22px;padding:24px 26px;background:rgba(23,35,49,.6);
+  border:1px solid var(--line);border-left:3px solid var(--warm);border-radius:0 18px 18px 0}
+.honest .kicker{color:var(--warm);margin-bottom:10px}
+.honest p{color:#c9d3df;font-size:16px;line-height:1.6;max-width:74ch}
+.honest .fine{color:var(--text-dim)}
+.honest .btn{margin-top:20px}
+@media (max-width:560px){.honest{padding:20px}}
+
 /* ---------- 2. the other way: split head, image-led cards ---------- */
 #twins .head-s{display:grid;grid-template-columns:1.1fr 1fr;gap:18px 60px;align-items:end}
 @media (max-width:860px){#twins .head-s{grid-template-columns:1fr}}
@@ -593,6 +618,8 @@ footer p{font-size:14.5px;color:var(--text-secondary);max-width:80ch;line-height
 footer p+p{margin-top:8px}
 footer .fine{margin-top:8px}
 footer .brand{font-size:19px;margin-bottom:12px;text-shadow:none}
+.f-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:20px 28px}
+.f-top .btn-line{flex:none;color:var(--text-primary)}
 
 @media (pointer:coarse){.btn,.btn-sm,.go{min-height:44px;display:inline-flex;align-items:center;justify-content:center}}
 
@@ -804,7 +831,48 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
   <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 20 C140 23 280 17 420 20 S700 23 840 20 1060 17 1200 20"/><path d="M300 30 C440 28 580 32 720 30 S960 28 1100 30"/></svg></div>
 
-  <!-- ===================== 2. THE OTHER WAY ===================== -->
+  <!-- ===================== 2. UNDER THE HOOD ===================== -->
+  <section class="sec" id="works" aria-labelledby="works-h">
+    <div class="wrap">
+      <div class="head-s rise">
+        <div><p class="kicker">Under the hood</p><h2 class="h2" id="works-h">The crowd answer comes from a trained model.</h2></div>
+        <p class="lede">Not a rule of thumb, and not a table someone typed in. A classifier learned the pattern from seven years of daily numbers, and every answer it can give is built into this page before you open it.</p>
+      </div>
+      <div class="works stagger">
+        <article class="work">
+          <p class="step">01 &middot; The model</p>
+          <h3>XGBoost, three classes</h3>
+          <p>A gradient-boosted tree classifier sorts a destination and a date into Not crowded, Normal crowd or Very crowded: 300 trees over nine features. scikit-learn does the label encoding, the stratified 80/20 split and the scoring. The probability behind the winning class is the confidence shown on your crowd card.</p>
+          <p class="tools"><span>XGBClassifier</span><span>scikit-learn</span><span>pandas</span></p>
+        </article>
+        <article class="work">
+          <p class="step">02 &middot; The data</p>
+          <h3>74,153 destination-days</h3>
+          <p>One row per destination per day, 29 places from 2018 to 2024, each with visitors, temperature, rainfall, an event count and search interest. The three labels are cut at the visitor quartiles. Five of the nine features summarise that destination's own history on the same calendar day, which is how a date in 2027 gets an answer at all.</p>
+          <p class="tools"><span>29 destinations</span><span>7 years, daily</span><span>9 features</span></p>
+        </article>
+        <article class="work">
+          <p class="step">03 &middot; On this page</p>
+          <h3>24,737 answers, precomputed</h3>
+          <p>A browser cannot run Python, so an export script asks the model every question this page can ask, 29 destinations across 853 days, and packs the replies into a 107 KB file. Your forecast is then a lookup, with no server anywhere. Weather and the drive are fetched live, only when you ask for them.</p>
+          <p class="tools"><span>export_site_data.py</span><span>data.js</span><span>static host</span></p>
+        </article>
+      </div>
+      <div class="honest rise">
+        <p class="kicker">How sure it is</p>
+        <p>57.2% right on a held-out fifth of the days, where always answering Normal crowd scores 50.1%. The visitor data is synthetic, and one history feature includes the day being predicted: take that out and accuracy falls to 47.2%. So Shaant reads the season well, and cannot yet tell one town's crowd from another's.</p>
+        <p class="fine">Hotel prices are not modelled. They are rough ranges from general knowledge, and every stay card links out for today's rate.</p>
+        <a class="btn ghost" href="https://github.com/shauryajohri/tourist_prediction#the-model" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A7.995 7.995 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          The model, the data and the code
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 21 C150 18 300 24 450 21 S750 18 900 21 1050 24 1200 21"/><path d="M220 31 C380 29 540 33 700 31 S980 29 1080 31"/></svg></div>
+
+  <!-- ===================== 3. THE OTHER WAY ===================== -->
   <section class="sec" id="twins" aria-labelledby="twins-h">
     <div class="wrap">
       <div class="head-s rise">
@@ -824,7 +892,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
   <div class="wrap" aria-hidden="true"><svg class="shore" viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0 19 C160 16 320 22 480 19 S800 16 960 19 1120 22 1200 19"/><path d="M80 29 C240 27 400 31 560 29 S860 27 980 29"/></svg></div>
 
-  <!-- ===================== 3. GOOD TO KNOW ===================== -->
+  <!-- ===================== 4. GOOD TO KNOW ===================== -->
   <section class="sec" id="faq" aria-labelledby="faq-h">
     <div class="wrap faq-grid">
       <div class="faq-title rise"><p class="kicker">Good to know</p><h2 class="h2" id="faq-h">Before you go</h2></div>
@@ -839,7 +907,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     </div>
   </section>
 
-  <!-- ===================== 4. THE CLOSE ===================== -->
+  <!-- ===================== 5. THE CLOSE ===================== -->
   <section class="sec" id="go" aria-labelledby="go-h">
     <div class="bg" id="go-bg" aria-hidden="true"></div>
     <div class="motes" aria-hidden="true"><i style="--x:14%;--y:40%;--s:150px;--d:32s;--dl:-8s"></i><i style="--x:70%;--y:22%;--s:120px;--d:26s;--dl:-14s"></i><i style="--x:52%;--y:66%;--s:170px;--d:36s;--dl:-3s"></i></div>
@@ -853,9 +921,17 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
 
 <footer>
   <div class="wrap">
-    <p class="brand"><span class="dev" lang="hi">शांत</span>Shaant</p>
-    <p>Shaant, for Uttarakhand. Find the calm version of your trip.</p>
-    <p class="fine">Pictures on this site are AI-made. Crowd forecasts come from a model trained on sample data.</p>
+    <div class="f-top">
+      <div>
+        <p class="brand"><span class="dev" lang="hi">शांत</span>Shaant</p>
+        <p>Shaant, for Uttarakhand. Find the calm version of your trip.</p>
+      </div>
+      <a class="btn-line" href="https://github.com/shauryajohri/tourist_prediction" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A7.995 7.995 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        Code on GitHub
+      </a>
+    </div>
+    <p class="fine">Pictures on this site are AI-made. Crowd forecasts come from an XGBoost classifier trained on sample data: 57.2% accurate on held-out days, against 50.1% for always saying Normal crowd. <a href="https://github.com/shauryajohri/tourist_prediction#the-model" target="_blank" rel="noopener">How it was built</a>.</p>
     <p class="fine">Weather from Open-Meteo. Map tiles &copy; Esri, map data &copy; OpenStreetMap contributors. Routes from the OSRM route service. Hotel names and prices are rough guides, not quotes.</p>
     <p class="fine">Your starting point is sent only to the route service to draw the line, and remembered in this browser so you do not have to type it again.</p>
   </div>
